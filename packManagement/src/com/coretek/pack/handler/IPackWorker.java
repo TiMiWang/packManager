@@ -14,7 +14,7 @@ public interface IPackWorker extends Runnable {
 
 	/**
 	 * svn导出平台文件
-	 * @param svnNetPath
+	 * @param svnNetPath svn路径 指向顶级目录  LambdaPRO级
 	 * @param exportLocalPath
 	 * @return
 	 */
@@ -26,7 +26,7 @@ public interface IPackWorker extends Runnable {
 	 * @param pluginsBuildOutPath
 	 * @return
 	 */
-	boolean buildPlugins(String pluginsSrcPath,String pluginsBuildOutPath);
+	boolean buildPlugins(String pluginsSrcPath,String pluginsBuildOutPath,int packmodeId);
 	
 	/**
 	 * 构建库文件，并复制到对应的目录
@@ -49,6 +49,6 @@ public interface IPackWorker extends Runnable {
 	 * @param platfomPackPath
 	 * @return
 	 */
-	boolean platformPack(String platformPath,String platfomPackPath);
+	boolean platformPack(String platformPath,String platfomPackPath,int packModeId);
 	
 }

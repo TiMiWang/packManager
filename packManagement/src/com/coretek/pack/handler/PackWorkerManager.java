@@ -13,7 +13,7 @@ import com.coretek.pack.service.IPackModeService;
 
 public class PackWorkerManager implements IPackWorkerManager{
 	
-	public static String packUtilsPath = "G:/work/dabao/packUtils";
+	public static String packUtilsPath = "F:/dsp/dabao/packUtils";
 
 	private static PackWorkerManager packworkermanager = null;
 	
@@ -62,9 +62,13 @@ public class PackWorkerManager implements IPackWorkerManager{
 		if(!file.exists()){
 			file.mkdirs();
 		}
-		
-		IPackWorker packworker = new PackWorker(packmode,packModeService, resourcePath);
-		packwokerMap.put(packmode.getId(), packworker);
+		IPackWorker packworker = null;
+		if(packmode.getStructureType().equals("dsp")){
+			packworker = new DSPPackWorker(packmode,packModeService, resourcePath);
+		}
+		if(packworker!=null){
+			packwokerMap.put(packmode.getId(), packworker);
+		}
 		return packworker;
 	}
 

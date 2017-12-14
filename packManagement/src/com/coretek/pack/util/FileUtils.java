@@ -13,9 +13,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
@@ -256,32 +259,64 @@ public class FileUtils {
      * 				解压后存放的目录
      * @throws Exception
      */
-    public static void zipToFile(String zipFilePath, String destDir) throws Exception {
-        int leng = 0;
-        byte[] b = new byte[1024*2];
-        /** 获取zip格式的文件 **/
-        if(zipFilePath!=null && !"".equals(zipFilePath)){
-                File file = new File(zipFilePath);
-                /** 解压的输入流 * */
-                ZipInputStream zis = new ZipInputStream(new FileInputStream(file));
-                ZipEntry entry=null;
-                while ((entry=zis.getNextEntry())!=null) {
-                    File destFile =null;
-                    if(destDir.endsWith(File.separator)){
-                        destFile = new File(destDir + entry.getName());
-                    }else {
-                        destFile = new File(destDir + "/" + entry.getName());
-                    }
-                    /** 把解压包中的文件拷贝到目标目录 * */
-                    FileOutputStream fos = new FileOutputStream(destFile);
-                    while ((leng = zis.read(b)) != -1) {
-                        fos.write(b, 0, leng);
-                    }
-                    fos.close();
-                }
-                zis.close();
-        }
+    public static void zipToFile(String zipFilePath, String destDir) throws Exception {  
+        
+      ZipFile zip = new ZipFile(zipFilePath,Charset.forName("GBK"));//解决中文文件夹乱码  
+      String name = zip.getName().substring(zip.getName().lastIndexOf('\\')+1, zip.getName().lastIndexOf('.'));  
+//        
+//      File pathFile = new File(destDir,name);  
+//      if (!pathFile.exists()) {  
+//          pathFile.mkdirs();  
+//      }  
+        
+      for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements();) {  
+          ZipEntry entry = (ZipEntry) entries.nextElement();  
+          String zipEntryName = entry.getName();  
+          InputStream in = zip.getInputStream(entry);  
+          String outPath = (destDir +"/"+ zipEntryName).replaceAll("\\*", "/");  
+            
+          // 判断路径是否存在,不存在则创建文件路径  
+          File file = new File(outPath.substring(0, outPath.lastIndexOf('/')));  
+          if (!file.exists()) {  
+              file.mkdirs();  
+          }  
+          // 判断文件全路径是否为文件夹,如果是上面已经上传,不需要解压  
+          if (new File(outPath).isDirectory()) {  
+              continue;  
+          }   
+
+          FileOutputStream out = new FileOutputStream(outPath);  
+          byte[] buf1 = new byte[1024];  
+          int len;  
+          while ((len = in.read(buf1)) > 0) {  
+              out.write(buf1, 0, len);  
+          }  
+          in.close();  
+          out.close();  
+      }  
+      System.out.println("******************解压完毕********************");  
+      return;  
     }
+    
+    
+   public static boolean contentToFile(String filePath,String content){
+	   boolean flag = true;
+	    File tempPluginXMLFile = new File(filePath);
+	    if(tempPluginXMLFile.exists()){
+	    	tempPluginXMLFile.delete();
+	    }
+	    try {
+			tempPluginXMLFile.createNewFile();
+			PrintWriter out = new PrintWriter(tempPluginXMLFile);
+			out.write(content);
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			flag = false;
+			e.printStackTrace();
+		}
+	   return flag;
+   }
     
     /** 
      * 将存放在sourceFilePath目录下的源文件，打包成fileName名称的zip文件，并存放到zipFilePath路径下 

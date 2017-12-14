@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.coretek.pack.handler.IPackWorker;
-import com.coretek.pack.handler.PackWorker;
 import com.coretek.pack.handler.PackWorkerManager;
 import com.coretek.pack.model.PackMode;
 import com.coretek.pack.model.PackModeExample;
@@ -58,6 +57,7 @@ public class PackModeController {
 	public IPackModeService getPackModeService() {
 		return packModeService;
 	}
+	
 	@Inject
 	public void setPackModeService(IPackModeService packModeService) {
 		this.packModeService = packModeService;
@@ -90,7 +90,6 @@ public class PackModeController {
 		return "packmode/list";
 	}
 	
-	
 	@RequestMapping(value="uploadfile/{id}",method = RequestMethod.POST)
 	public @ResponseBody Object pack(Model model, @PathVariable int id, HttpSession session,@RequestParam MultipartFile file,HttpServletRequest request){
 			ajaxMsg.clear();
@@ -100,7 +99,7 @@ public class PackModeController {
 				return ajaxMsg;
 			}
 			
-	      	String path = request.getSession().getServletContext().getRealPath("upload")+"/"+"temp_"+id;
+	      	String path = PackWorkerManager.packUtilsPath+"/"+"LambdaPRO_"+id;
 	      	if(!new File(path).exists()){
 	      		new File(path).mkdir();
 	      	}
@@ -112,14 +111,10 @@ public class PackModeController {
 	        //MultipartFile自带的解析方法  
 	        try {
 				file.transferTo(dir);
-		        if(dir.exists()){
-		        	FileUtils.zipToFile(dir.getAbsolutePath(), path);
-		        	FileUtils.delFile(dir.getAbsolutePath());
-		        }
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			packmode.setPlatformLocalPath(path);
+			packmode.setPlatformLocalPath(dir.getAbsolutePath());
 			packModeService.updateByPrimaryKey(packmode);
 		
 			ajaxMsg.addHeader(MsgType.SUCCESS, "上传成功");
@@ -133,14 +128,17 @@ public class PackModeController {
 		PackMode packmode = packModeService.selectByPrimaryKey(id);
 		IPackWorker packworker = packWorkerManager.getPackWorker(id);
 		if(packmode!=null && packworker!=null){
+			ajaxMsg.addHeader(MsgType.SUCCESS, "请求成功");
 			ajaxMsg.addData("id", id);
 			ajaxMsg.addData("loginfo", packworker.getLogInfo());
 			ajaxMsg.addData("status", packmode.getStatus());
 			ajaxMsg.addData("downloadPath", packworker.getoutputpackpath());
 		}else{
+			packmode.setStatus(0);
+			packModeService.updateByPrimaryKey(packmode);
+			ajaxMsg.addData("id", id);
 			ajaxMsg.addHeader(MsgType.ERROR, "打包失败");
 		}
-		
 		return ajaxMsg;
 	}
 	
@@ -172,7 +170,6 @@ public class PackModeController {
 		packModeService.insert(packmode);
 		return "redirect:/packmode/getallpackmode.do";
 	}
-	
 
 	@RequestMapping(value = "update/{id}", method = RequestMethod.GET)
 	public String updateGet(@PathVariable int id, Model model) {

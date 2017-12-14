@@ -17,7 +17,7 @@
 
 <script type="text/javascript">
 
-var statusTimer = null;
+var timerDict = new Array();
 
 function statusTimerFun(id)
 {
@@ -38,23 +38,28 @@ function callback_update_status_pack()
               var code=objResults.header.code;
               var message=objResults.header.message;
               var id = objResults.data.id;
-              var status = objResults.data.status;
-              var loginfo = objResults.data.loginfo;
-              var downloadPath = objResults.data.downloadPath;
               if(code==200)
             	  {
+                  var status = objResults.data.status;
+                  var loginfo = objResults.data.loginfo;
+                  var downloadPath = objResults.data.downloadPath;
+                  
             	  $("#status"+id).text("打包进度信息:"+loginfo);
             	  if(status==0){
             		  $("#status"+id).text("下载:"+downloadPath);
                 	  jBox.tip("打包完成"); 
-                	  clearInterval(statusTimer);
+                	  if(timerDict["timer"+id]!=null){
+                		  clearInterval(timerDict["timer"+id]);
+                	  }
                 	 // window.location.href="<%=request.getContextPath() %>/resources/img/LambdaPRO.installer6.0-x86.rar"
             	  }
             	  }
               else
             	  {
             	  jBox.tip(message); 
-            	  clearInterval(statusTimer)
+            	  if(timerDict["timer"+id]!=null){
+            		  clearInterval(timerDict["timer"+id]);
+            	  }
             	  }
             } 
         }
@@ -389,32 +394,35 @@ $(function(){
 											if("${packmode.status}"==0)
 											{
 												$("#status${packmode.id}").text("可使用");
-												if(statusTimer!=null){
-													clearInterval(statusTimer);
+												if(timerDict["timer${packmode.id}"]!=null){
+													clearInterval(timerDict["timer${packmode.id}"]);
 												}
 											}else{
 												$("#status${packmode.id}").text("正在使用");
-											    statusTimer = setInterval(function(){statusTimerFun("${packmode.id}")},5000)
+												if(timerDict["timer${packmode.id}"]==null){
+												    var statusTimer = setInterval(function(){statusTimerFun("${packmode.id}")},5000)
+												    timerDict["timer${packmode.id}"] = statusTimer;
+												}
 											}
-											if("${packmode.isSvnCheck}"==0)
+											if("${packmode.isSvnCheck}"==1)
 											{
 												$("#svncheck${packmode.id}").text("是");
 											}else{
 												$("#svncheck${packmode.id}").text("否");
 											}
-											if("${packmode.isUpdateUuid}"==0)
+											if("${packmode.isUpdateUuid}"==1)
 											{
 												$("#updateuuid${packmode.id}").text("是");
 											}else{
 												$("#updateuuid${packmode.id}").text("否");
 											}
-											if("${packmode.isUpdateKey}"==0)
+											if("${packmode.isUpdateKey}"==1)
 											{
 												$("#updatekey${packmode.id}").text("是");
 											}else{
 												$("#updatekey${packmode.id}").text("否");
 											}
-											if("versionInfo${packmode.id}"==0)
+											if("versionInfo${packmode.id}"==1)
 											{
 												$("#versionInfo${packmode.id}").text("是");
 											}else{

@@ -51,14 +51,14 @@ body { background: url("<%=request.getContextPath() %>/resources/img/bg.jpg") }
 
 													<label class="block clearfix">
 														<span class="block input-icon input-icon-right">
-															<input type="password" class="form-control" placeholder="密码"  name="password"  value="admin"/>
+															<input type="password" class="form-control" placeholder="密码"  name="password"  value="admin123"/>
 															<i class="ace-icon fa fa-lock"></i>
 														</span>
 													</label>
 													
 													<label class="block clearfix">
 														<span class="block input-icon input-icon-right">
-															<input type="password" class="form-control" placeholder="验证码" name="checkcode" />
+															<input type="text" class="form-control" placeholder="验证码" name="checkcode" />
 															<span style="cursor:pointer"> <img src="drawCheckCode.do" onclick="reCheckcode(this)" /></span>
 														</span>
 													</label>

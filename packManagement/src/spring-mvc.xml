@@ -36,7 +36,7 @@ http://www.springframework.org/schema/context/spring-context-3.0.xsd
 
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
 		<property name="defaultEncoding" value="UTF-8" />
-		<property name="maxUploadSize" value="1073741824" />
+		<property name="maxUploadSize" value="2147483648" />
 		<property name="maxInMemorySize" value="409600" />
 	</bean>
 
