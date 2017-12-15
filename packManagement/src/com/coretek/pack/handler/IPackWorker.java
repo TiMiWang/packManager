@@ -10,6 +10,8 @@ public interface IPackWorker extends Runnable {
 	
 	boolean isRunning();
 	
+	boolean isSuccess();
+	
 	String getoutputpackpath();
 
 	/**

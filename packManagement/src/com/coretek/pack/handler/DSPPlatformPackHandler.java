@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 
 import com.coretek.pack.util.FileUtils;
 
-public class PlatformPackHandler implements IPlatformPackHandler {
+public class DSPPlatformPackHandler implements IPlatformPackHandler {
 
 	private String installerEXEPath = "F:/dsp/dabao/IS12/System/";
 	private String cmdEXEName = "IsCmdBld.exe";
@@ -14,7 +14,7 @@ public class PlatformPackHandler implements IPlatformPackHandler {
 
 	private String installProjectPath = "";
 
-	public PlatformPackHandler(String installProjectPath) {
+	public DSPPlatformPackHandler(String installProjectPath) {
 		this.installProjectPath = installProjectPath;
 	}
 
@@ -28,7 +28,7 @@ public class PlatformPackHandler implements IPlatformPackHandler {
 	public boolean installPackRun() {
 		boolean status = true;
 		try {
-			String[] commands = {installerEXEPath+"/"+cmdEXEName,"-p",projectName,"-c","COMP","-a","\"build\""};
+			String[] commands = {installerEXEPath+"/"+cmdEXEName,"-p",projectName,"-r","SINGLE_EXE_IMAGE"};
 			ProcessBuilder processtest = new ProcessBuilder(commands);
 			processtest.directory(new File(installProjectPath));
 			processtest.redirectErrorStream(true);
@@ -44,6 +44,8 @@ public class PlatformPackHandler implements IPlatformPackHandler {
 				System.out.println("error");
 				status = false;
 			}
+			//压缩安装包到指定的路径
+			
 		} catch (Exception ex) {
 			status = false;
 			ex.getStackTrace();
@@ -52,5 +54,25 @@ public class PlatformPackHandler implements IPlatformPackHandler {
 		}
 		return status;
 	}
+	
+	@Override
+	public boolean installPackageMoving(String srcInstallPackagePath,String destInstallPackagePath){
+		boolean status = true;
+		try{
+			//test
+
+			File file = new File(srcInstallPackagePath);
+			if(file.exists()){
+				FileUtils.moveFile(srcInstallPackagePath, destInstallPackagePath);
+			}else{
+				status = false;
+			}
+		}catch(Exception ex){
+			status = false;
+			ex.getStackTrace();
+		}
+		return status;
+	}
+
 
 }

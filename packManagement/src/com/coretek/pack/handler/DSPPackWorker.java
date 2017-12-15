@@ -12,6 +12,7 @@ public class DSPPackWorker implements IPackWorker {
 	private String LogInfo = "开始打包流程";
 
 	private boolean isRunning = false;
+	private boolean isSuccess = false;
 
 	private PackMode packmode;
 	private String prePlatformPath;
@@ -23,6 +24,11 @@ public class DSPPackWorker implements IPackWorker {
 		this.packmode = packmode;
 		this.packModeService = packModeService;
 		this.tempoutputpackpath = tempoutputpackpath;
+	}
+
+	@Override
+	public boolean isSuccess() {
+		return isSuccess;
 	}
 
 	@Override
@@ -44,8 +50,8 @@ public class DSPPackWorker implements IPackWorker {
 				//此时packmode.getPlatformLocalPath()为压缩包路径
 				File platformFile = new File(packmode.getPlatformLocalPath());
 		        if(platformFile.exists()){
-//		        	FileUtils.zipToFile(platformFile.getAbsolutePath(), platformFile.getParent());
-//		        	FileUtils.delFile(platformFile.getAbsolutePath());
+		        	FileUtils.zipToFile(platformFile.getAbsolutePath(), platformFile.getParent());
+		        	FileUtils.delFile(platformFile.getAbsolutePath());
 		        	packmode.setPlatformLocalPath(platformFile.getParent());
 		        }else{
 		        	LogInfo = "解压包不存在，打包失败";
@@ -57,23 +63,42 @@ public class DSPPackWorker implements IPackWorker {
 			}
 			
 			LogInfo = "开始构建插件";
-			buildPlugins(preSrcPath+"/"+"tool/host/ide/src",prePlatformPath+"/LambdaIDE/eclipse/plugins",packmode.getId());
-			LogInfo = "完成构建插件";
+			boolean status = buildPlugins(preSrcPath+"/"+"tool/host/ide/src",prePlatformPath+"/LambdaIDE/eclipse",packmode.getId());
+			if(status){
+				LogInfo = "完成构建插件";
+			}else{
+				LogInfo = "构建插件失败";
+			}
 			LogInfo = "开始构建依赖库";
-			buildOSLibarys(preSrcPath+"/os",prePlatformPath+"/DeltaOS/lib/c66xx/little");
-			LogInfo = "完成构建依赖库";
+			status = buildOSLibarys(preSrcPath+"/os",prePlatformPath+"/DeltaOS/lib/c66xx/little");
+			if(status){
+				LogInfo = "完成构建依赖库";
+			}else{
+				LogInfo = "构建依赖库失败";
+			}
 			LogInfo = "开始加密平台";
-			platformEncrypt(prePlatformPath);
-			LogInfo = "完成平台加密";
+			status = platformEncrypt(prePlatformPath);
+			if(status){
+				LogInfo = "完成平台加密";
+			}else{
+				LogInfo = "平台加密失败";
+			}
 			LogInfo = "开始平台打安装包";
-			platformPack(prePlatformPath,tempoutputpackpath,packmode.getId());
-			LogInfo = "结束平台打安装包";
+			status = platformPack(prePlatformPath,tempoutputpackpath,packmode.getId());
+			if(status){
+				LogInfo = "打安装包包完成";
+				isSuccess = true;
+				packmode.setStatus(2);
+			}else{
+				LogInfo = "打安装包失败";
+				isSuccess = false;
+				packmode.setStatus(3);
+			}
+			LogInfo = "结束平台安装包打包";
 			/*********************/
 		} catch (Exception ex) {
 			ex.getStackTrace();
 		} finally {
-			LogInfo = "完成打包";
-			packmode.setStatus(0);
 			packModeService.updateByPrimaryKey(packmode);
 			isRunning = false;
 		}
@@ -105,7 +130,7 @@ public class DSPPackWorker implements IPackWorker {
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
 		}
-		tempPMIdFile.mkdir();
+		tempPMIdFile.mkdirs();
 		try{
 		IPluginsExportHandler handler = new DSPPluginsExportHandler();
 		LogInfo = "开始生成配置文件";
@@ -117,7 +142,10 @@ public class DSPPackWorker implements IPackWorker {
 		
 		xmlStr = handler.buildXmlGen(tempPluginXMLPath);
 		FileUtils.contentToFile(tempBuildXMLPath, xmlStr);
-		handler.PluginSrcRedirectePath(pluginsSrcPath);
+		status = handler.PluginSrcRedirectePath(pluginsSrcPath);
+		if(!status){
+			LogInfo = "重定向插件失败";
+		}
 		LogInfo = "开始导出插件";
 		status = handler.ExportRun(tempPMIdFile.getAbsolutePath());
 		}catch(Exception ex){
@@ -132,7 +160,7 @@ public class DSPPackWorker implements IPackWorker {
 	@Override
 	public boolean buildOSLibarys(String srcPath, String libarysBuildOutPath) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
@@ -187,18 +215,32 @@ public class DSPPackWorker implements IPackWorker {
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
 		}
-		tempPMIdFile.mkdir();
+		tempPMIdFile.mkdirs();
 		try{
 		String templatInstallProjectPath = PackWorkerManager.packUtilsPath+"/installPackage"+"/LambdPRO6.0-v12-DSP";
 		String destInstallProjectPath = tempPMIdFile+"/"+"LambdPRO6.0-v12-DSP";
 		FileUtils.copyFolder(templatInstallProjectPath, destInstallProjectPath);
 		
-		PlatformPackHandler handler = new PlatformPackHandler(destInstallProjectPath);
+		DSPPlatformPackHandler handler = new DSPPlatformPackHandler(destInstallProjectPath);
 		handler.copyPlatform2installerPath(platformPath);
-		handler.installPackRun();
+		status = handler.installPackRun();
+		if(status){
+			LogInfo = "打安装包成功";
+		}else{
+			LogInfo = "打安装包失败";
+			return status;
+		}
+		status = handler.installPackageMoving(destInstallProjectPath+"/Media/SINGLE_EXE_IMAGE/Package/Setup.exe", platfomPackPath);
+		if(status){
+			LogInfo = "安装包移动成功";
+		}else{
+			LogInfo = "安装包移动失败";
+			return status;
+		}
 		
 		}catch(Exception ex){
 			ex.getStackTrace();
+			status = false;
 		}finally{
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
 		}

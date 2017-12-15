@@ -7,7 +7,7 @@ public interface IPluginsExportHandler {
 	 * @param pluginSrcPath
 	 * @return
 	 */
-	void PluginSrcRedirectePath(String pluginSrcPath);
+	boolean PluginSrcRedirectePath(String pluginSrcPath);
 	
 	String buildXmlGen(String pluginXmlPath);
 	String pluginXmlGen(String pluginsBuildOutPath);

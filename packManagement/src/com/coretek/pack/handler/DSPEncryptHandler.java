@@ -59,7 +59,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
 		}
-		tempPMIdFile.mkdir();
+		tempPMIdFile.mkdirs();
 		try {
 			FileUtils.zipToFile(jarPath, tempPMIdFile.getAbsolutePath());
 			String filePath = tempPMIdFile.getAbsolutePath() + "/"
@@ -107,7 +107,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
 		}
-		tempPMIdFile.mkdir();
+		tempPMIdFile.mkdirs();
 		FileUtils.copyFolder(encryptPath + "/" + fileStr,
 				tempPMIdFile.getAbsolutePath() + "/" + fileStr);
 
@@ -159,7 +159,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
 		}
-		tempPMIdFile.mkdir();
+		tempPMIdFile.mkdirs();
 		try {
 			FileUtils.zipToFile(jarPath, tempPMIdFile.getAbsolutePath());
 			String filePath = tempPMIdFile.getAbsolutePath() + "/"
@@ -199,7 +199,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
 		}
-		tempPMIdFile.mkdir();
+		tempPMIdFile.mkdirs();
 		FileUtils.copyFolder(encryptPath + "/" + "file_encrypt",
 				tempPMIdFile.getAbsolutePath() + "/" + "file_encrypt");
 		File encryptFile = new File(tempPMIdFile.getAbsoluteFile() + "/"
@@ -233,7 +233,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 							// 拷貝vid.dat到平臺目錄
 							String newVidPath = platformPath
 									+ "/"
-									+ "LambdaIDE/eclipse/plugins/com.coretek.tools.ide.configmanager_1.0.0";
+									+ "LambdaIDE/eclipse/plugins/com.ti.ccstudio.base_6.2.1.01781";
 							FileUtils.moveFile(vidFile.getAbsolutePath(),
 									newVidPath);
 						} else {

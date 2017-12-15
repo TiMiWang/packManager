@@ -42,16 +42,21 @@ function callback_update_status_pack()
             	  {
                   var status = objResults.data.status;
                   var loginfo = objResults.data.loginfo;
-                  var downloadPath = objResults.data.downloadPath;
+                  var issuccess = objResults.data.issuccess;
                   
             	  $("#status"+id).text("打包进度信息:"+loginfo);
-            	  if(status==0){
-            		  $("#status"+id).text("下载:"+downloadPath);
-                	  jBox.tip("打包完成"); 
+            	  if(status==2){
+            		  if(issuccess == true){
+                		  $("#status"+id).text("打包完成");
+                		  $("#status"+id).append("<a href=\"<%=request.getContextPath() %>/packmode/download/\"+id+\".do\">点击下载</a>");
+                    	  jBox.tip("打包完成"); 
+            		  }else{
+            			  $("#status"+id).text("打包失败");
+            		  }
+
                 	  if(timerDict["timer"+id]!=null){
                 		  clearInterval(timerDict["timer"+id]);
                 	  }
-                	 // window.location.href="<%=request.getContextPath() %>/resources/img/LambdaPRO.installer6.0-x86.rar"
             	  }
             	  }
               else
@@ -114,59 +119,6 @@ function callback_delete()
             } 
         }
 }
-function callback_pack()
-{
-        if(xmlhttp.readyState == 4) 
-        {
-            if(xmlhttp.status == 200)
-            { 
-              // 转换Json数据为javascript对象
-              eval("var objResults =" + xmlhttp.responseText);  
-              var code=objResults.header.code;
-              var message=objResults.header.message;
-              if(code==200)
-            	  {
-            	  jBox.tip("打包成功"); 
-            	  $("#status").text("打包完成")
-            	  clearInterval(statusTimer)
-            	  window.location.reload();
-            	  }
-              else
-            	  {
-            	  $("#status").text("打包失败")
-            	  clearInterval(statusTimer)
-            	  jBox.tip(message); 
-            	  }
-            } 
-        }
-}
-//回调处理
-function callback()
-{
-        if(xmlhttp.readyState == 4) 
-        {
-            if(xmlhttp.status == 200)
-            { 
-              // 转换Json数据为javascript对象
-              eval("var objResults =" + xmlhttp.responseText);            
-              var displaytext = "";
-              //获取用于显示菜单的下拉列表  
-              var displaySelect = document.getElementById("packmodeId");  
-              //将目标下拉列表清空  
-              displaySelect.innerHTML = null;  
-              displaySelect.options.add(new Option('全部',''));
-              for (var i=0; i < objResults.data.length; i++)
-              {
-                /* displaytext += objResults.Results.computer[i].Manufacturer + " " +
-                    objResults.Results.computer[i].Model + ": $" + 
-                    objResults.Results.computer[i].Price + "<br>";  */
-                    displaySelect.options.add(new Option(objResults.data[i].carTypename,objResults.data[i].packmodeId));
-              } 
-                //var finddiv = document.getElementById("divResponse");//寻找显示容器
-                //finddiv.innerHTML = displaytext;//引用解析好了的数据
-            } 
-        }
-}
 
 
 function windowOpen2(url)
@@ -200,7 +152,7 @@ function windowOpen1(url)
 	 jBox("iframe:"+url, { title: "上传",width: iWidth,height: iHeight,submit: myfunc ,
          buttons: {}}); 
 }
-function show(id){
+function updateAndPack(id){
 	
 	//windowOpen('${ctx }/packmode/update/'+id+".do")
 	window.location.href="<%=request.getContextPath() %>/packmode/update/"+id+".do"
@@ -232,26 +184,9 @@ var deletesubmit = function (v, h, f) {
     return true; //close
 };
 
-var packSubmit = function (v, h, f) {
-    if (v == 'ok')
-    {
-    	
-	   	 var url = '${ctx }/packmode/pack/'+packmodeId+".do";
-	   	 xmlhttp.open("GET", url, true);
-	     xmlhttp.onreadystatechange = callback_pack;
-	     xmlhttp.send(formData);
-	     statusTimer = setInterval(function(){statusTimerFun()},5000)
-        }
-    return true; //close
-};
 function del(id){
 	packmodeId = id;
 	jBox.confirm("确定吗？", "确认删除？将删除打包方案的信息", deletesubmit);
-		
-	}
-function pack(id){
-	packmodeId = id;
-	jBox.confirm("确定吗？", "确认开始打包吗？", packSubmit);
 		
 	}
 
@@ -260,6 +195,8 @@ function addPackMode(){
 }
 
 $(function(){
+	
+	
 	$("#createTimeDescSort").click(function(){
 		$("#orderBy").val("create_time desc");
 		//refreshPage();
@@ -397,11 +334,22 @@ $(function(){
 												if(timerDict["timer${packmode.id}"]!=null){
 													clearInterval(timerDict["timer${packmode.id}"]);
 												}
-											}else{
+											}else if("${packmode.status}"==1){
 												$("#status${packmode.id}").text("正在使用");
 												if(timerDict["timer${packmode.id}"]==null){
 												    var statusTimer = setInterval(function(){statusTimerFun("${packmode.id}")},5000)
 												    timerDict["timer${packmode.id}"] = statusTimer;
+												}
+											}else if("${packmode.status}"==2){
+												$("#status${packmode.id}").text("已完成");
+												if(timerDict["timer${packmode.id}"]==null){
+												    var statusTimer = setInterval(function(){statusTimerFun("${packmode.id}")},5000)
+												    timerDict["timer${packmode.id}"] = statusTimer;
+												}
+											}else if("${packmode.status}"==3){
+												$("#status${packmode.id}").text("打包失败");
+												if(timerDict["timer${packmode.id}"]!=null){
+													clearInterval(timerDict["timer${packmode.id}"]);
 												}
 											}
 											if("${packmode.isSvnCheck}"==1)
@@ -431,14 +379,11 @@ $(function(){
 											</script>
 												
 											<td>																							
-										 <a class="btn btn-xs btn-info" onclick="show('${packmode.id}')" title="打包">
+										 <a class="btn btn-xs btn-info" onclick="updateAndPack('${packmode.id}')" title="打包">
 															<i class="ace-icon fa fa-pencil bigger-120"></i>
 													</a>
 													
 														<a class="btn btn-xs btn-danger" onclick="del('${packmode.id }')" title="删除">
-														<i class="ace-icon fa fa-trash-o bigger-120"></i>
-													</a>
-														<a class="btn btn-xs btn-danger" onclick="pack('${packmode.id }')" title="打包">
 														<i class="ace-icon fa fa-trash-o bigger-120"></i>
 													</a>
 																						

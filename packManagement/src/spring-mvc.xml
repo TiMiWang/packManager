@@ -23,6 +23,7 @@ http://www.springframework.org/schema/context/spring-context-3.0.xsd
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
 		<property name="messageConverters">
 			<list>
+				<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
 				<ref bean="mappingJacksonHttpMessageConverter" />  <!-- json转换器 -->
 			</list>
 		</property>

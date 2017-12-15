@@ -35,12 +35,12 @@ public class FileUtils {
      * 
      * @param dir 目录
      */
-    public static void mkdir(String dir) {
+    public static void mkdirs(String dir) {
         try {
             String dirTemp = dir;
             File dirPath = new File(dirTemp);
             if (!dirPath.exists()) {
-                dirPath.mkdir();
+                dirPath.mkdirs();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -158,7 +158,7 @@ public class FileUtils {
     public static void copyFile(String srcFile, String dirDest) {
         try {
             FileInputStream in = new FileInputStream(srcFile);
-            mkdir(dirDest);
+            mkdirs(dirDest);
             FileOutputStream out = new FileOutputStream(dirDest+"/"+new File(srcFile).getName());
             int len;
             byte buffer[] = new byte[1024];
@@ -185,7 +185,7 @@ public class FileUtils {
     public static void copyFolder(String oldPath, String newPath) {
         try {
             // 如果文件夹不存在 则新建文件夹
-            mkdir(newPath);
+            mkdirs(newPath);
             File file = new File(oldPath);
             String[] files = file.list();
             File temp = null;

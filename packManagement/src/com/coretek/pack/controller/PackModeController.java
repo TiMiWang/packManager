@@ -1,8 +1,6 @@
 package com.coretek.pack.controller;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -10,6 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -132,7 +134,7 @@ public class PackModeController {
 			ajaxMsg.addData("id", id);
 			ajaxMsg.addData("loginfo", packworker.getLogInfo());
 			ajaxMsg.addData("status", packmode.getStatus());
-			ajaxMsg.addData("downloadPath", packworker.getoutputpackpath());
+			ajaxMsg.addData("issuccess",packworker.isSuccess());
 		}else{
 			packmode.setStatus(0);
 			packModeService.updateByPrimaryKey(packmode);
@@ -206,68 +208,45 @@ public class PackModeController {
 			}
 			packModeService.updateByPrimaryKey(packmode);
 			
+			IPackWorker packworker = packWorkerManager.getPackWorker(id);
+			if(packworker!=null){
+				File outputPath = new File(packworker.getoutputpackpath());
+				if(outputPath.exists()){
+					FileUtils.delFolder(outputPath.getAbsolutePath());
+				}
+				packWorkerManager.removePackWorker(id);
+			}
+
 			//開始调用异步打包
-			IPackWorker packworker = packWorkerManager.createPackWorker(tpackmode,packModeService,"G:/work/dabao/web/packManagement/WebContent/resources/platfrom");
+			packworker = packWorkerManager.createPackWorker(packmode,packModeService,"F:/dsp/dabao/web/packManagement/WebContent/resources/platfrom");
 			packWorkerManager.packWorkerWorking(packworker);
 		}
 		return "redirect:/packmode/getallpackmode.do";
 	}
-
 	
-	public boolean packHandler(PackMode packmode){
-		StringBuffer tempCommand = new StringBuffer();
-		tempCommand.append("python.exe");
-		tempCommand.append(" ");
-		tempCommand.append("smtpt.py");
-		tempCommand.append(" ");
-		tempCommand.append(packmode.getPlatformLocalPath());
-		tempCommand.append(" ");
-		tempCommand.append(packmode.getIsSvnCheck());
-		tempCommand.append(" ");
-		tempCommand.append(packmode.getSvnNetPath()+"/");
-		tempCommand.append(" ");
-		tempCommand.append(packmode.getVersionInfo());
-		tempCommand.append(" ");
-		tempCommand.append(packmode.getIndate());
-		tempCommand.append(" ");
-		tempCommand.append(packmode.getSystemVersion());
-		tempCommand.append(" ");
-		tempCommand.append(packmode.getStructureType());
-		tempCommand.append(" ");
-		tempCommand.append(packmode.getIsUpdateKey());
-		tempCommand.append(" ");
-		tempCommand.append(packmode.getIsUpdateUuid());
-		tempCommand.append(" ");
-//		tempCommand.append(packmode.getOutputPath());
-		
-		String command = tempCommand.toString();
-		try {
-			Process process = Runtime.getRuntime().exec(command,new String[]{"F:/web_dabao/Python27","D:/Java/jdk1.7.0_17/bin"},new File("G:/work/dabao/auto_package/eclipse/owner/dabao/src"));
-			BufferedReader inputread = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			String tempstr;
-			while((tempstr =inputread.readLine())!=null){
-				System.out.println(tempstr);
-				statusInfo = tempstr;
-			}
-			BufferedReader erroRead = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-			while((tempstr =erroRead.readLine())!=null){
-				System.out.println(tempstr);
-			}
-			process.waitFor();
-			return true;
+	@RequestMapping(value = "download/{id}", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<byte[]> downInstallPackFile(@PathVariable("id") int id){
+		IPackWorker packwork = PackWorkerManager.getInstance().getPackWorker(id);
+		if(packwork==null){
+			return null;
+		}
+		String installPackPath = packwork.getoutputpackpath();
+        ResponseEntity<byte[]> entity = null;
+        try {
+    		File file = new File(installPackPath);  
+    		if(file.exists()){
+        		String dfileName = new String(file.getName().getBytes("gb2312"), "iso8859-1");
+    	        HttpHeaders headers = new HttpHeaders();  
+    	        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+    	        headers.setContentDispositionFormData("attachment", dfileName);
+    	        entity = new ResponseEntity<byte[]>(org.apache.commons.io.FileUtils.readFileToByteArray(file), headers, HttpStatus.CREATED);  
+    		}
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		return false;
-	}
-	
-	
-
-
-	
-	
-	
-	
+		}  
+        return entity;  
+		
+	} 
 	
 
 }

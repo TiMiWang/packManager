@@ -55,9 +55,9 @@ public class PackWorkerManager implements IPackWorkerManager{
 	@Override
 	public IPackWorker createPackWorker(PackMode packmode,IPackModeService packModeService, String resourceRootPath) {
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");//可以方便地修改日期格式
-		String datestr = dateFormat.format(new Date());
-		String resourcePath = resourceRootPath+"/platfrom"+datestr;
+//		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");//可以方便地修改日期格式
+//		String datestr = dateFormat.format(new Date());
+		String resourcePath = resourceRootPath+"/platfrom_"+packmode.getId();
 		File file = new File(resourcePath);
 		if(!file.exists()){
 			file.mkdirs();

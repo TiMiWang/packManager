@@ -179,9 +179,14 @@ function callback_upload()
 							<td width="100"><label>是否SVN签出: </label></td>					
 							<td>
 								<div>
-									<sf:input path="isSvnCheck" style="width:150px"  onblur="Cmdusername(this)" placeholder="是否SVN签出"/>
-									<sf:errors  path="isSvnCheck"/>
+									<%-- <sf:input id="testttt" path="isSvnCheck" onblur="Cmdusername(this)" placeholder="是否SVN签出"/> --%>
+									<!--<sf:errors  path="isSvnCheck"/>-->
+									<select id="issvncheckout" style="width:150px" onchange="svnCheck_change('parent',this)"> 
+									<option value="1">是</option> 
+									<option value="0">否</option> 
+									</select> 
 								</div>
+
 							</td>
 							</tr >	
 							
@@ -198,7 +203,7 @@ function callback_upload()
 							<td width="100"><label>平台SVN路径: </label></td>					
 							<td>
 								<div>
-									<sf:input path="platformSvnPath" style="width:150px"  onblur="Cmdusername(this)" placeholder="平台SVN路径"/>
+									<sf:input id="svnpathid" path="platformSvnPath" style="width:150px"  onblur="Cmdusername(this)" placeholder="平台SVN路径"/>
 									<sf:errors  path="platformSvnPath"/>
 								</div>
 							</td>
@@ -208,8 +213,12 @@ function callback_upload()
 							<td width="100"><label>是否试用版: </label></td>					
 							<td>
 								<div>
-									<sf:input path="versionInfo" style="width:150px"  onblur="Cmdusername(this)" placeholder="是否试用版"/>
-									<sf:errors  path="versionInfo"/>
+									<!--<sf:input path="versionInfo" style="width:150px"  onblur="Cmdusername(this)" placeholder="是否试用版"/>
+									<sf:errors  path="versionInfo"/>-->
+									<select id="isthread" style="width:150px" onchange="versioninfo_change('parent',this)"> 
+									<option value="0">是</option> 
+									<option value="1">否</option> 
+									</select> 
 								</div>
 							</td>
 							</tr >	
@@ -228,8 +237,10 @@ function callback_upload()
 							<td width="100"><label>系统版本: </label></td>					
 							<td>
 								<div>
-									<sf:input path="systemVersion" style="width:150px"  onblur="Cmdusername(this)" placeholder="系统版本"/>
-									<sf:errors  path="systemVersion"/>
+									<!--<sf:input path="systemVersion" style="width:150px"  onblur="Cmdusername(this)" placeholder="系统版本"/>
+									<sf:errors  path="systemVersion"/>-->
+									<select id="systemVersion" style="width:150px" onchange="systemversion('parent',this)"> 
+									</select> 
 								</div>
 							</td>
 							</tr >
@@ -238,14 +249,23 @@ function callback_upload()
 							<td width="100"><label>架构: </label></td>					
 							<td>
 								<div>
-									<sf:input path="structureType" style="width:150px"  onblur="Cmdusername(this)" placeholder="架构"/>
-									<sf:errors  path="structureType"/>
+									<!--<sf:input path="structureType" style="width:150px"  onblur="Cmdusername(this)" placeholder="架构"/>
+									<sf:errors  path="structureType"/>-->
+									<select id=structuretypeid style="width:150px" onchange="structuretype_change('parent',this,0)"> 
+									<option value="dsp">DSP</option> 
+									<option value="x86">X86</option> 
+									</select> 
 								</div>
 							</td>
 							</tr >
+							<tr> </tr>
+							<tr> </tr>
+							<tr> </tr>
+							<tr> </tr>
+							<tr> </tr>
 							
-							<tr >		
-							<td width="100"><label>是否更新秘钥: </label></td>					
+							<!--<tr >		
+							 <td width="100"><label>是否更新秘钥: </label></td>					
 							<td>
 								<div>
 									<sf:input path="isUpdateKey" style="width:150px"  onblur="Cmdusername(this)" placeholder="是否更新秘钥"/>
@@ -262,12 +282,12 @@ function callback_upload()
 									<sf:errors  path="isUpdateUuid"/>
 								</div>
 							</td>
-							</tr >	
+							</tr >	-->
 
 					</table>
 				</sf:form>
 				
-										<div class="page-header position-relative">
+								<div class="page-header position-relative">
 								<table style="width: 100%;">
 									<tbody>
 										<tr>
@@ -287,11 +307,30 @@ function callback_upload()
 	</div>
 <%@ include file="../common/common_js.jsp"%>
 
+
+
+
 <%-- <script type="text/javascript" src="<%=request.getContextPath() %>/resources/js/jquery-1.7.2.min.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath() %>/resources/js/jquery.validate.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath() %>/resources/js/core/jquery.cms.validate.js"></script> --%>
 <script type="text/javascript">
+
+$("#structuretypeid").val("${packmode.structureType}");
+$("#isthread").val("${packmode.versionInfo}");
+$("#issvncheckout").val("${packmode.isSvnCheck}");
+
+var svnCheck_change = function(parent,object) {
+	$("#testttt").val(object.find("option:selected").val());
+}
+var versioninfo_change = function(parent,object) {
+	
+}
+var systemversion = function(parent,object) {
+	
+}
+
 $(function(){
+	
 	$("#addForm").cmsvalidate();
 });
 </script>
