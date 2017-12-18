@@ -26,6 +26,7 @@ import com.coretek.pack.handler.IPackWorker;
 import com.coretek.pack.handler.PackWorkerManager;
 import com.coretek.pack.model.PackMode;
 import com.coretek.pack.model.PackModeExample;
+import com.coretek.pack.model.Person;
 import com.coretek.pack.model.PersonExample;
 import com.coretek.pack.model.logInfoExample;
 import com.coretek.pack.page.Pager;
@@ -85,7 +86,7 @@ public class PackModeController {
 		if(session!=null){
 		packmodeexample.clear();
 		List<PackMode> packmodelist = packModeService.selectByExample(packmodeexample);
-		Pager<PackMode> listpackmode = new Pager<PackMode>(1,
+		Pager<PackMode> listpackmode = new Pager<PackMode>(packmodelist.size(),
 				packmodelist);
 		model.addAttribute("packmodelist", listpackmode);
 		}
@@ -103,8 +104,9 @@ public class PackModeController {
 			
 	      	String path = PackWorkerManager.packUtilsPath+"/"+"LambdaPRO_"+id;
 	      	if(!new File(path).exists()){
-	      		new File(path).mkdir();
+	      		FileUtils.delAllFile(path);
 	      	}
+	      	new File(path).mkdir();
 	        String fileName = file.getOriginalFilename();    
 	        File dir = new File(path,fileName);          
 	        if(!dir.exists()){  
@@ -187,8 +189,16 @@ public class PackModeController {
 
 	@RequestMapping(value = "updateandpack/{id}", method = RequestMethod.POST)
 	public String updatePost(@PathVariable("id") int id,
-			@Valid PackMode packmode, BindingResult br, Model model,HttpServletRequest request) {
+			@Valid PackMode packmode, BindingResult br, Model model,HttpServletRequest request, HttpSession session) {
 		if (br.hasErrors()) {
+			return "packmode/update";
+		}
+		String userid = (Integer)session.getAttribute("userid")+"";
+		if(userid==""){
+			return "packmode/update";
+		}
+		Person person = personservice.selectByPrimaryKey(Integer.parseInt(userid));
+		if(person==null){
 			return "packmode/update";
 		}
 		if (id > 0) {
@@ -196,7 +206,7 @@ public class PackModeController {
 			packmode.setId(id);
 			packmode.setStatus(1);
 			if(packmode.getIsSvnCheck()==1){
-		      	String path = request.getSession().getServletContext().getRealPath("upload")+"/"+"temp_"+id;     
+		      	String path = PackWorkerManager.packUtilsPath+"/"+"LambdaPRO_"+id;   
 		        File dir = new File(path);          
 		        if(dir.exists()){  
 		            FileUtils.delFolder(path); 
@@ -218,7 +228,7 @@ public class PackModeController {
 			}
 
 			//開始调用异步打包
-			packworker = packWorkerManager.createPackWorker(packmode,packModeService,"F:/dsp/dabao/web/packManagement/WebContent/resources/platfrom");
+			packworker = packWorkerManager.createPackWorker(packmode,person,packModeService,"F:/dsp/dabao/web/packManagement/WebContent/resources/platfrom");
 			packWorkerManager.packWorkerWorking(packworker);
 		}
 		return "redirect:/packmode/getallpackmode.do";
@@ -231,20 +241,20 @@ public class PackModeController {
 			return null;
 		}
 		String installPackPath = packwork.getoutputpackpath();
-        ResponseEntity<byte[]> entity = null;
-        try {
-    		File file = new File(installPackPath);  
-    		if(file.exists()){
-        		String dfileName = new String(file.getName().getBytes("gb2312"), "iso8859-1");
-    	        HttpHeaders headers = new HttpHeaders();  
-    	        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-    	        headers.setContentDispositionFormData("attachment", dfileName);
-    	        entity = new ResponseEntity<byte[]>(org.apache.commons.io.FileUtils.readFileToByteArray(file), headers, HttpStatus.CREATED);  
-    		}
+		ResponseEntity<byte[]> entity = null;
+		try {
+			File file = new File(installPackPath,"Setup.exe");  
+			if(file.exists()){
+				String dfileName = new String(file.getName().getBytes("gb2312"), "iso8859-1");
+				HttpHeaders headers = new HttpHeaders();  
+				headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+				headers.setContentDispositionFormData("attachment", dfileName);
+				entity = new ResponseEntity<byte[]>(org.apache.commons.io.FileUtils.readFileToByteArray(file), headers, HttpStatus.CREATED);  
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}  
-        return entity;  
+		return entity;  
 		
 	} 
 	

@@ -113,7 +113,7 @@ function windowOpen2(url)
 	var iHeight=500; //弹出窗口的高度;
 	var iTop = (window.screen.availHeight-30-iHeight)/2; //获得窗口的垂直位置;
 	var iLeft = (window.screen.availWidth-10-iWidth)/2; //获得窗口的水平位置;
-	 jBox("get:"+url, { title: "实验室管理",width: iWidth,height: iHeight,submit: myfunc ,
+	 jBox("get:"+url, { title: "人员管理",width: iWidth,height: iHeight,submit: myfunc ,
          buttons: { '关闭': false }}); 
 }
 
@@ -124,7 +124,7 @@ function windowOpen(url)
 	var iHeight=500; //弹出窗口的高度;
 	var iTop = (window.screen.availHeight-30-iHeight)/2; //获得窗口的垂直位置;
 	var iLeft = (window.screen.availWidth-10-iWidth)/2; //获得窗口的水平位置;
-	 jBox("get:"+url, { title: "实验室管理",width: iWidth,height: iHeight,submit: myfunc ,
+	 jBox("get:"+url, { title: "人员管理",width: iWidth,height: iHeight,submit: myfunc ,
          buttons: { '确定': true ,'关闭': false }}); 
 }
 function windowOpen1(url)
@@ -169,89 +169,18 @@ var submit1 = function (v, h, f) {
 };
 function del(carTypeId){
 	cartypeid = carTypeId;
-	jBox.confirm("确定吗？", "确认删除？将删除这条打卡记录相关信息", submit1);
+	jBox.confirm("确定吗？", "确认删除？将删除相关信息", submit1);
 		
 	}
 
-function showAll(id){
-	windowOpen2('${ctx }/laboratorymodel/showTmall/'+id+".do")
-}
-function addLaboratoryModel(){
-	windowOpen('${ctx }/laboratorymodel/add.do')
-}
-function download(){
-	windowOpen('${ctx }/download/downLoad/1450165813296')
-}
-function importexcel(){
-	windowOpen1('${ctx }/import/uploadExcel.do')
-}
 
 $(function(){
-	$("#createTimeDescSort").click(function(){
-		$("#orderBy").val("create_time desc");
-		refreshPage();
-		});
 
-	$("#createTimeAscSort").click(function(){
-		$("#orderBy").val("create_time asc");
-		refreshPage();
-		});
-	
-	$("#recordTimeDescSort").click(function(){
-		$("#orderBy").val("record_time desc");
-		refreshPage1();
-		});
-
-	$("#recordTimeAscSort").click(function(){
-		$("#orderBy").val("record_time asc");
-		refreshPage1();
-		});
-	function refreshPage()
-	{
-		var createTimeValue = $("#createTime").val();
-		var orderBy = $("#orderBy").val();
-		var customer = new Object();
-		customer.createTime=createTimeValue;
-		
-			//car.userName=userNameValue;
-			//car.orderStatus=orderStatusValue;
-			//car.orderDate=orderDateValue;
-			customer.orderBy=orderBy;   
-		   	var url = "<%=request.getContextPath() %>" + "/laboratorymodel/selectTmallRecord.do?";
-		 	var json=stringify(customer);
-		 	window.location.href=url+"data="+json;
-	}
-	
-	function refreshPage1()
-	{
-		var recordTimeValue = $("#recordTime").val();
-		var orderBy = $("#orderBy").val();
-		var customer = new Object();
-		customer.recordTime=recordTimeValue;
-		
-			//car.userName=userNameValue;
-			//car.orderStatus=orderStatusValue;
-			//car.orderDate=orderDateValue;
-			customer.orderBy=orderBy;   
-		   	var url = "<%=request.getContextPath() %>" + "/laboratorymodel/selectTmallRecord.do?";
-		 	var json=stringify(customer);
-		 	window.location.href=url+"data="+json;
-	}
 
 	
    	// 注册点击检索按钮事件函数
    	$("#searchButton").click(function(){
-   	   	var lnameValue = $("#lname").val();
-   	   	var laddressValue = $("#laddress").val();
-   		
-   		
-   	   	var tmall= new Object();
-   		tmall.lname=lnameValue;
-   		tmall.laddress=laddressValue;
-   		
-   	   	var url = "<%=request.getContextPath() %>/laboratorymodel/selectTmallRecord.do?";
-   	 	var json=stringify(tmall);
-	    window.location.href=url+"data="+json;
+
    	   //	$.get(url, {data :stringify(car)}, function(result){
    	   		
    	   //	});
@@ -277,14 +206,7 @@ function loaded()
 	}
 	
 }
-function onCardlogochanged(carlogoId)
-{
-    // retrieve the JSON text from the local file.
-    var url = "${ctx }/carType/getCartypeByLogoId/"+carlogoId;
-    xmlhttp.open("GET", url, true);
-    xmlhttp.onreadystatechange = GetCarTypeByCarLogo;
-    xmlhttp.send(null);
-}
+
 </script>
 <script src="<%=request.getContextPath() %>/resources/jquery.js"></script>
 <script src="<%=request.getContextPath() %>/resources/jquery.datetimepicker.js"></script>
@@ -315,7 +237,7 @@ $(function(){
 					<i class="ace-icon fa fa-home home-icon"></i>
 					<a href="#">用户管理</a>
 				</li> 
-				<li class="active">打包记录</li>
+				<li class="active">人员信息</li>
 			</ul><!-- /.breadcrumb -->			
 		</div>
 		<div class="page-content">

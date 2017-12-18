@@ -79,6 +79,8 @@ public class DSPPluginsExportHandler implements IPluginsExportHandler{
 		} catch (Exception e) {
 			status = false;
 			e.printStackTrace();
+		}finally{
+			FileUtils.delAllFile(pluginsSrcPath);
 		}
 		return status;
 	}

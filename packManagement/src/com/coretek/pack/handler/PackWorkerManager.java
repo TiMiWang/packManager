@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.coretek.pack.model.PackMode;
+import com.coretek.pack.model.Person;
 import com.coretek.pack.service.IPackModeService;
 
 public class PackWorkerManager implements IPackWorkerManager{
@@ -53,7 +54,7 @@ public class PackWorkerManager implements IPackWorkerManager{
 	}
 
 	@Override
-	public IPackWorker createPackWorker(PackMode packmode,IPackModeService packModeService, String resourceRootPath) {
+	public IPackWorker createPackWorker(PackMode packmode,Person person,IPackModeService packModeService, String resourceRootPath) {
 		
 //		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");//可以方便地修改日期格式
 //		String datestr = dateFormat.format(new Date());
@@ -64,7 +65,7 @@ public class PackWorkerManager implements IPackWorkerManager{
 		}
 		IPackWorker packworker = null;
 		if(packmode.getStructureType().equals("dsp")){
-			packworker = new DSPPackWorker(packmode,packModeService, resourcePath);
+			packworker = new DSPPackWorker(packmode, person,packModeService, resourcePath);
 		}
 		if(packworker!=null){
 			packwokerMap.put(packmode.getId(), packworker);

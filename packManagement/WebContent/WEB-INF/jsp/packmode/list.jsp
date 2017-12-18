@@ -44,11 +44,11 @@ function callback_update_status_pack()
                   var loginfo = objResults.data.loginfo;
                   var issuccess = objResults.data.issuccess;
                   
-            	  $("#status"+id).text("打包进度信息:"+loginfo);
+            	  $("#status"+id).text("正在打包，进度:"+loginfo);
             	  if(status==2){
             		  if(issuccess == true){
                 		  $("#status"+id).text("打包完成");
-                		  $("#status"+id).append("<a href=\"<%=request.getContextPath() %>/packmode/download/\"+id+\".do\">点击下载</a>");
+                		  $("#status"+id).append("<a href=\"<%=request.getContextPath() %>/packmode/download/"+id+".do\"> 点击下载</a>");
                     	  jBox.tip("打包完成"); 
             		  }else{
             			  $("#status"+id).text("打包失败");
@@ -153,7 +153,10 @@ function windowOpen1(url)
          buttons: {}}); 
 }
 function updateAndPack(id){
-	
+	if(timerDict["timer"+id]!=null){
+		alert("正在打产品安装包");
+		return;
+	}
 	//windowOpen('${ctx }/packmode/update/'+id+".do")
 	window.location.href="<%=request.getContextPath() %>/packmode/update/"+id+".do"
 }
@@ -195,33 +198,7 @@ function addPackMode(){
 }
 
 $(function(){
-	
-	
-	$("#createTimeDescSort").click(function(){
-		$("#orderBy").val("create_time desc");
-		//refreshPage();
-		});
-
-	
-   	// 注册点击检索按钮事件函数
-   	$("#searchButton").click(function(){
-   	   	var lnameValue = $("#lname").val();
-   	   	var laddressValue = $("#laddress").val();
-   		
-   		
-   	   	var tmall= new Object();
-   		tmall.lname=lnameValue;
-   		tmall.laddress=laddressValue;
-   		
-   	   	var url = "<%=request.getContextPath() %>/laboratorymodel/selectTmallRecord.do?";
-   	 	var json=stringify(tmall);
-	    window.location.href=url+"data="+json;
-   	   //	$.get(url, {data :stringify(car)}, function(result){
-   	   		
-   	   //	});
-   	   
-   	});
-   	
+ 	
     function stringify(json,space)
    	{
    		if(typeof(space)=='undefined')
@@ -306,9 +283,8 @@ $(function(){
 										<th>有效期</th>
 										<th>系统版本</th>
 										<th>架构</th>
-										<th>是否更新秘钥</th>
-										<th>是否更新UUID</th>
-										<th>svn平台路径</th>
+					<!-- 				<th>是否更新秘钥</th>
+										<th>是否更新UUID</th> -->
 										<th>状态</th>
 									</tr>
 								</thead>
@@ -323,9 +299,8 @@ $(function(){
 											<td>${packmode.indate }</td>
 											<td>${packmode.systemVersion }</td>
 											<td>${packmode.structureType }</td>
-											<td id="updatekey${packmode.id}">${packmode.isUpdateKey }</td>
-											<td id="updateuuid${packmode.id}">${packmode.isUpdateUuid }</td>
-											<td>${packmode.platformSvnPath}</td>
+<%-- 										<td id="updatekey${packmode.id}">${packmode.isUpdateKey }</td>
+											<td id="updateuuid${packmode.id}">${packmode.isUpdateUuid }</td> --%>
 											<td id= "status${packmode.id}">${packmode.status }</td>
 											<script>
 											if("${packmode.status}"==0)
@@ -358,7 +333,7 @@ $(function(){
 											}else{
 												$("#svncheck${packmode.id}").text("否");
 											}
-											if("${packmode.isUpdateUuid}"==1)
+										 /*if("${packmode.isUpdateUuid}"==1)
 											{
 												$("#updateuuid${packmode.id}").text("是");
 											}else{
@@ -369,7 +344,7 @@ $(function(){
 												$("#updatekey${packmode.id}").text("是");
 											}else{
 												$("#updatekey${packmode.id}").text("否");
-											}
+											} */
 											if("versionInfo${packmode.id}"==1)
 											{
 												$("#versionInfo${packmode.id}").text("是");

@@ -58,9 +58,9 @@ function CmdTime(obj){
 			<ul class="breadcrumb">
 				<li>
 					<i class="ace-icon fa fa-home home-icon"></i>
-					<a href="#">信息管理</a>
+					<a href="#">用户管理</a>
 				</li>
-				<li class="active">信息管理</li>
+				<li class="active">信息</li>
 			</ul><!-- /.breadcrumb -->			
 		</div>
 		

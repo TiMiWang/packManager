@@ -85,6 +85,15 @@ function onprogress(evt){
 	}
 	
 function submit_pack(){
+	if("${packmode.isSvnCheck}"=="0"){
+		if($("#son").html()!="100%"){
+			alert("请先上传本地平台");
+			return;
+		}
+	}else if("${packmode.svnNetPath}".indexOf("LambdaPRO")==-1){
+		alert("请完善svn路径信息");
+		return;
+	}
 	$('#packingForm').submit();
 	}
 
@@ -164,7 +173,7 @@ function callback_upload()
 					
 					<table style="border-collapse:separate; border-spacing:10px;" >
 						<tr >				
-							<td width="100"><label>平台本地路径: </label></td>
+							<td width="100"><label>平台上传路径: </label></td>
 							<td>
 							<input type="file" id="uploadfile_id" onchange="printFileInfo()"/>
 							</td>					
@@ -172,16 +181,16 @@ function callback_upload()
 							<div id="son"/>
 							</td>
 							<td>
-							<a class="btn btn-info fa" type="button" value="上传文件" onclick="uploadFile()" >上传</a>
+							<a id="uploadbutton_id" class="btn btn-info fa" type="button" value="上传文件" onclick="uploadFile()" >上传</a>
 							</td>
 							</tr >
 							<tr >		
 							<td width="100"><label>是否SVN签出: </label></td>					
 							<td>
 								<div>
-									<%-- <sf:input id="testttt" path="isSvnCheck" onblur="Cmdusername(this)" placeholder="是否SVN签出"/> --%>
+									<sf:input id="svnchenck_id" path="isSvnCheck" onblur="Cmdusername(this)" placeholder="是否SVN签出" style="display:none"/>
 									<!--<sf:errors  path="isSvnCheck"/>-->
-									<select id="issvncheckout" style="width:150px" onchange="svnCheck_change('parent',this)"> 
+									<select id="svnchenckid" style="width:150px" onchange="svnCheck_change(this)"> 
 									<option value="1">是</option> 
 									<option value="0">否</option> 
 									</select> 
@@ -194,28 +203,20 @@ function callback_upload()
 							<td width="100"><label>SVN地址: </label></td>					
 							<td>
 								<div>
-									<sf:input path="svnNetPath" style="width:150px"  onblur="Cmdusername(this)" placeholder="SVN地址"/>
+									<sf:input id="svnpath_id" path="svnNetPath" style="width:150px"  onblur="Cmdusername(this)" placeholder="SVN地址"/>
 									<sf:errors  path="svnNetPath"/>
 								</div>
 							</td>
 							</tr >	
 							<tr >	
-							<td width="100"><label>平台SVN路径: </label></td>					
-							<td>
-								<div>
-									<sf:input id="svnpathid" path="platformSvnPath" style="width:150px"  onblur="Cmdusername(this)" placeholder="平台SVN路径"/>
-									<sf:errors  path="platformSvnPath"/>
-								</div>
-							</td>
-							</tr >	
 							
 							<tr >	
 							<td width="100"><label>是否试用版: </label></td>					
 							<td>
 								<div>
-									<!--<sf:input path="versionInfo" style="width:150px"  onblur="Cmdusername(this)" placeholder="是否试用版"/>
-									<sf:errors  path="versionInfo"/>-->
-									<select id="isthread" style="width:150px" onchange="versioninfo_change('parent',this)"> 
+									<sf:input id="versioninfo_id" path="versionInfo" style="display:none"  onblur="Cmdusername(this)" placeholder="是否试用版"/>
+									<sf:errors  path="versionInfo"/>
+									<select id="versioninfid" style="width:150px" onchange="versioninfo_change(this)"> 
 									<option value="0">是</option> 
 									<option value="1">否</option> 
 									</select> 
@@ -224,7 +225,7 @@ function callback_upload()
 							</tr >	
 							
 							<tr >	
-							<td width="100"><label>有效期: </label></td>					
+							<td width="100"><label>有效期(天): </label></td>					
 							<td>
 								<div>
 									<sf:input path="indate" style="width:150px"  onblur="Cmdusername(this)" placeholder="有效期"/>
@@ -237,9 +238,9 @@ function callback_upload()
 							<td width="100"><label>系统版本: </label></td>					
 							<td>
 								<div>
-									<!--<sf:input path="systemVersion" style="width:150px"  onblur="Cmdusername(this)" placeholder="系统版本"/>
-									<sf:errors  path="systemVersion"/>-->
-									<select id="systemVersion" style="width:150px" onchange="systemversion('parent',this)"> 
+									<sf:input id="systemversion_id" path="systemVersion" style="display:none"  onblur="Cmdusername(this)" placeholder="系统版本"/>
+									<sf:errors  path="systemVersion"/>
+									<select id="systemversionid" style="width:150px" onchange="systemversion(this)"> 
 									</select> 
 								</div>
 							</td>
@@ -249,9 +250,9 @@ function callback_upload()
 							<td width="100"><label>架构: </label></td>					
 							<td>
 								<div>
-									<!--<sf:input path="structureType" style="width:150px"  onblur="Cmdusername(this)" placeholder="架构"/>
-									<sf:errors  path="structureType"/>-->
-									<select id=structuretypeid style="width:150px" onchange="structuretype_change('parent',this,0)"> 
+									<sf:input id="structtype_id" path="structureType" style="display:none"  onblur="Cmdusername(this)" placeholder="架构"/>
+									<sf:errors  path="structureType"/>
+									<select id=structuretypeid style="width:150px" onchange="structuretype_change(this)"> 
 									<option value="dsp">DSP</option> 
 									<option value="x86">X86</option> 
 									</select> 
@@ -316,18 +317,35 @@ function callback_upload()
 <script type="text/javascript">
 
 $("#structuretypeid").val("${packmode.structureType}");
-$("#isthread").val("${packmode.versionInfo}");
-$("#issvncheckout").val("${packmode.isSvnCheck}");
+$("#versioninfid").val("${packmode.versionInfo}");
 
-var svnCheck_change = function(parent,object) {
-	$("#testttt").val(object.find("option:selected").val());
+$("#svnchenckid").val("${packmode.isSvnCheck}");
+if("${packmode.isSvnCheck}"=="0"){
+	$("#svnpath_id").attr("disabled",true);
+	$("#uploadbutton_id").attr("disabled",false);
+}else{
+	$("#svnpath_id").attr("disabled",false);
+	$("#uploadbutton_id").attr("disabled",true);
 }
-var versioninfo_change = function(parent,object) {
-	
+
+var svnCheck_change = function(object) {
+	var selectval = object.options[object.selectedIndex].value;
+	if(selectval=="0"){
+		$("#svnpath_id").attr("disabled",true);
+		$("#uploadbutton_id").attr("disabled",false);
+	}else{
+		$("#svnpath_id").attr("disabled",false);
+		$("#uploadbutton_id").attr("disabled",true);
+	}
+	$("#svnchenck_id").val(selectval);
 }
-var systemversion = function(parent,object) {
-	
+var versioninfo_change = function(object) {
+	$("#versioninfo_id").val(object.options[object.selectedIndex].value);
 }
+var structuretype_change = function(object) {
+	$("#structtype_id").val(object.options[object.selectedIndex].value);
+}
+
 
 $(function(){
 	

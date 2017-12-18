@@ -61,6 +61,10 @@ public class DSPEncryptHandler implements IEncryptHandler{
 		}
 		tempPMIdFile.mkdirs();
 		try {
+			if(!new File(jarPath).exists()){
+				status = false;
+				return status;
+			}
 			FileUtils.zipToFile(jarPath, tempPMIdFile.getAbsolutePath());
 			String filePath = tempPMIdFile.getAbsolutePath() + "/"
 					+ "com/coretek/ide/system/core" + "/" + "Activator.class";

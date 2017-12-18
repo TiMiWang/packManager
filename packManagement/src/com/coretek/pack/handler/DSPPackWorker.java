@@ -1,8 +1,11 @@
 package com.coretek.pack.handler;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 
 import com.coretek.pack.model.PackMode;
+import com.coretek.pack.model.Person;
 import com.coretek.pack.service.IPackModeService;
 import com.coretek.pack.util.FileUtils;
 
@@ -18,10 +21,12 @@ public class DSPPackWorker implements IPackWorker {
 	private String prePlatformPath;
 	private String preSrcPath;
 	private String tempoutputpackpath;
-	public IPackModeService packModeService = null;
+	private IPackModeService packModeService = null;
+	private Person person;
 
-	public DSPPackWorker(PackMode packmode,IPackModeService packModeService,String tempoutputpackpath) {
+	public DSPPackWorker(PackMode packmode,Person person,IPackModeService packModeService,String tempoutputpackpath) {
 		this.packmode = packmode;
+		this.person = person;
 		this.packModeService = packModeService;
 		this.tempoutputpackpath = tempoutputpackpath;
 	}
@@ -43,7 +48,7 @@ public class DSPPackWorker implements IPackWorker {
 			/*********************/
 			if(packmode.getIsSvnCheck()==1){
 				LogInfo = "开始svn下载";
-				exportPlatformFromSVN(packmode.getPlatformSvnPath(),packmode.getPlatformLocalPath());
+				exportPlatformFromSVN(packmode.getSvnNetPath(),packmode.getPlatformLocalPath());
 				LogInfo = "完成svn下载";
 			}else{
 				LogInfo = "开始解压平台";
@@ -55,11 +60,21 @@ public class DSPPackWorker implements IPackWorker {
 		        	packmode.setPlatformLocalPath(platformFile.getParent());
 		        }else{
 		        	LogInfo = "解压包不存在，打包失败";
+					isSuccess = false;
+					packmode.setStatus(3);
 		        	return; 
 		        }
 		        prePlatformPath = packmode.getPlatformLocalPath()+"/"+"platform";
 		        preSrcPath = packmode.getPlatformLocalPath()+"/"+"src";
 		        LogInfo = "完成平台解压";
+		        if(!new File(prePlatformPath).exists()){
+		        	LogInfo = "平台路径不存在";
+		        	return;
+		        }
+		        if(!new File(preSrcPath).exists()){
+		        	LogInfo = "源码路径不存在";
+		        	return;
+		        }
 			}
 			
 			LogInfo = "开始构建插件";
@@ -68,6 +83,9 @@ public class DSPPackWorker implements IPackWorker {
 				LogInfo = "完成构建插件";
 			}else{
 				LogInfo = "构建插件失败";
+				isSuccess = false;
+				packmode.setStatus(3);
+				return;
 			}
 			LogInfo = "开始构建依赖库";
 			status = buildOSLibarys(preSrcPath+"/os",prePlatformPath+"/DeltaOS/lib/c66xx/little");
@@ -75,6 +93,9 @@ public class DSPPackWorker implements IPackWorker {
 				LogInfo = "完成构建依赖库";
 			}else{
 				LogInfo = "构建依赖库失败";
+				isSuccess = false;
+				packmode.setStatus(3);
+				return;
 			}
 			LogInfo = "开始加密平台";
 			status = platformEncrypt(prePlatformPath);
@@ -82,6 +103,9 @@ public class DSPPackWorker implements IPackWorker {
 				LogInfo = "完成平台加密";
 			}else{
 				LogInfo = "平台加密失败";
+				isSuccess = false;
+				packmode.setStatus(3);
+				return;
 			}
 			LogInfo = "开始平台打安装包";
 			status = platformPack(prePlatformPath,tempoutputpackpath,packmode.getId());
@@ -108,17 +132,32 @@ public class DSPPackWorker implements IPackWorker {
 	@Override
 	public boolean exportPlatformFromSVN(String svnNetPath,
 			String exportLocalPath) {
-		String commandStr = "svn export "+svnNetPath;
+		boolean status = true;
 		File exportFile = new File(exportLocalPath);
-		try {
-			Process process = Runtime.getRuntime().exec(commandStr, new String[]{System.getenv("SVNPATH")}, exportFile);
-			if(process.waitFor()==0){
-				return true;
+		try {		
+			String[] commands = {System.getenv("SVN_PATH")+"/svn.exe","export",svnNetPath,"--username",person.getSvnUsername(),"--password",person.getSvnPassword()};
+			ProcessBuilder processtest = new ProcessBuilder(commands);
+			processtest.directory(exportFile);
+			processtest.redirectErrorStream(true);
+			Process process;
+			process = processtest.start();
+			BufferedReader br = new BufferedReader(new InputStreamReader(
+					process.getInputStream()));
+			String line = br.readLine();
+			while (line != null) {
+				System.out.print(line);
+				line = br.readLine();
 			}
+			if ((process.waitFor() != 0)) {
+				System.out.println("error");
+				status = false;
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
+			status = false;
 		}
-		return false;
+		return status;
 	}
 
 	@Override
@@ -142,12 +181,16 @@ public class DSPPackWorker implements IPackWorker {
 		
 		xmlStr = handler.buildXmlGen(tempPluginXMLPath);
 		FileUtils.contentToFile(tempBuildXMLPath, xmlStr);
+		LogInfo = "插件导出前准备";
 		status = handler.PluginSrcRedirectePath(pluginsSrcPath);
 		if(!status){
 			LogInfo = "重定向插件失败";
+			status = false;
+			return status;
 		}
 		LogInfo = "开始导出插件";
 		status = handler.ExportRun(tempPMIdFile.getAbsolutePath());
+		
 		}catch(Exception ex){
 			status = false;
 			ex.getStackTrace();
@@ -210,7 +253,7 @@ public class DSPPackWorker implements IPackWorker {
 	@Override
 	public boolean platformPack(String platformPath, String platfomPackPath,int packModeId) {
 		boolean status = true;
-		File tempPMIdFile = new File(PackWorkerManager.packUtilsPath, ""
+		final File tempPMIdFile = new File(PackWorkerManager.packUtilsPath, ""
 				+ "temp" + "_" + packModeId);
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
@@ -219,9 +262,17 @@ public class DSPPackWorker implements IPackWorker {
 		try{
 		String templatInstallProjectPath = PackWorkerManager.packUtilsPath+"/installPackage"+"/LambdPRO6.0-v12-DSP";
 		String destInstallProjectPath = tempPMIdFile+"/"+"LambdPRO6.0-v12-DSP";
+		if(!new File(destInstallProjectPath).exists()){
+			new File(destInstallProjectPath).mkdirs();
+		}
+		if(!new File(templatInstallProjectPath).exists()){
+			status = false;
+			return status;
+		}
 		FileUtils.copyFolder(templatInstallProjectPath, destInstallProjectPath);
 		
 		DSPPlatformPackHandler handler = new DSPPlatformPackHandler(destInstallProjectPath);
+		LogInfo = "拷贝平台到打包项目路径下";
 		handler.copyPlatform2installerPath(platformPath);
 		status = handler.installPackRun();
 		if(status){
@@ -242,7 +293,13 @@ public class DSPPackWorker implements IPackWorker {
 			ex.getStackTrace();
 			status = false;
 		}finally{
-			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
+			//异步清除临时文件
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
+				}
+			}).start();
 		}
 		return status;
 	}
