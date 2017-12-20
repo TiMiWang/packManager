@@ -23,8 +23,7 @@ import com.coretek.pack.util.AjaxMsg;
 import com.coretek.pack.util.Captcha;
 import com.coretek.pack.util.sessionContexts;
 @Controller
-@RequestMapping("loginController")
-
+@RequestMapping("login")
 public class LoginController extends BaseController{
 	private AjaxMsg ajaxMsg = AjaxMsg.newInstance();
 	
@@ -86,8 +85,6 @@ public class LoginController extends BaseController{
 			model.addAttribute("error", "用户名或密码错误");
 			return "admin/login";
 		}
-
-
 	}
 	@RequestMapping("/drawCheckCode")
 	public void drawCheckCode(HttpServletResponse resp, HttpSession session)

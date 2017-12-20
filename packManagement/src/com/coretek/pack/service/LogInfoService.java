@@ -6,33 +6,33 @@ import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
 
-import com.coretek.pack.dao.logInfoMapper;
-import com.coretek.pack.model.logInfo;
-import com.coretek.pack.model.logInfoExample;
+import com.coretek.pack.dao.LogInfoMapper;
+import com.coretek.pack.model.LogInfo;
+import com.coretek.pack.model.LogInfoExample;
 
 @Service("logInfoService")
 public class LogInfoService implements IlogInfoService {
 
-	private logInfoMapper logInfoMapper;
+	private LogInfoMapper logInfoMapper;
 	
 	
-	public logInfoMapper getLogInfoMapper() {
+	public LogInfoMapper getLogInfoMapper() {
 		return logInfoMapper;
 	}
 
 	@Inject
-	public void setLogInfoMapper(logInfoMapper logInfoMapper) {
+	public void setLogInfoMapper(LogInfoMapper logInfoMapper) {
 		this.logInfoMapper = logInfoMapper;
 	}
 
 	@Override
-	public int countByExample(logInfoExample example) {
+	public int countByExample(LogInfoExample example) {
 		// TODO Auto-generated method stub
 		return logInfoMapper.countByExample(example);
 	}
 
 	@Override
-	public int deleteByExample(logInfoExample example) {
+	public int deleteByExample(LogInfoExample example) {
 		// TODO Auto-generated method stub
 		return logInfoMapper.deleteByExample(example);
 	}
@@ -44,51 +44,52 @@ public class LogInfoService implements IlogInfoService {
 	}
 
 	@Override
-	public int insert(logInfo record) {
+	public int insert(LogInfo record) {
 		// TODO Auto-generated method stub
 		return logInfoMapper.insert(record);
 	}
 
 	@Override
-	public int insertSelective(logInfo record) {
+	public int insertSelective(LogInfo record) {
 		// TODO Auto-generated method stub
 		return logInfoMapper.insertSelective(record);
 	}
 
 	@Override
-	public List<logInfo> selectByExample(logInfoExample example) {
+	public List<LogInfo> selectByExample(LogInfoExample example) {
 		// TODO Auto-generated method stub
 		return logInfoMapper.selectByExample(example);
 	}
 
 	@Override
-	public logInfo selectByPrimaryKey(Integer id) {
+	public LogInfo selectByPrimaryKey(Integer id) {
 		// TODO Auto-generated method stub
 		return logInfoMapper.selectByPrimaryKey(id);
 	}
 
 	@Override
-	public int updateByExampleSelective(logInfo record, logInfoExample example) {
+	public int updateByExampleSelective(LogInfo record, LogInfoExample example) {
 		// TODO Auto-generated method stub
 		return logInfoMapper.updateByExampleSelective(record, example);
 	}
 
 	@Override
-	public int updateByExample(logInfo record, logInfoExample example) {
+	public int updateByExample(LogInfo record, LogInfoExample example) {
 		// TODO Auto-generated method stub
 		return logInfoMapper.updateByExample(record, example);
 	}
 
 	@Override
-	public int updateByPrimaryKeySelective(logInfo record) {
+	public int updateByPrimaryKeySelective(LogInfo record) {
 		// TODO Auto-generated method stub
 		return logInfoMapper.updateByPrimaryKeySelective(record);
 	}
 
 	@Override
-	public int updateByPrimaryKey(logInfo record) {
+	public int updateByPrimaryKey(LogInfo record) {
 		// TODO Auto-generated method stub
 		return logInfoMapper.updateByPrimaryKey(record);
 	}
 
+	
 }

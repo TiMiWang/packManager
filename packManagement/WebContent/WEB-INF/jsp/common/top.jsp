@@ -23,7 +23,7 @@
 			<a href="#" class="navbar-brand">
 				<small>
 					<i class="fa fa-globe"></i>
-					自主打包系統
+					自主打包系统
 				</small>
 			</a>
 

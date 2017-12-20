@@ -23,12 +23,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.coretek.pack.handler.IPackWorker;
+import com.coretek.pack.handler.LogInfoHandler;
 import com.coretek.pack.handler.PackWorkerManager;
+import com.coretek.pack.model.LogInfoExample;
 import com.coretek.pack.model.PackMode;
 import com.coretek.pack.model.PackModeExample;
 import com.coretek.pack.model.Person;
 import com.coretek.pack.model.PersonExample;
-import com.coretek.pack.model.logInfoExample;
 import com.coretek.pack.page.Pager;
 import com.coretek.pack.service.IPackModeService;
 import com.coretek.pack.service.IPersonSerivce;
@@ -48,10 +49,11 @@ public class PackModeController {
 	private IlogInfoService loginfoservice;
 	
 	private PackWorkerManager packWorkerManager = PackWorkerManager.getInstance();
+	private LogInfoHandler loginfoHandler = new LogInfoHandler();
 	
 	private PackModeExample packmodeexample = new PackModeExample();
 	private PersonExample personexample = new PersonExample();
-	private logInfoExample loginfo = new logInfoExample();
+	private LogInfoExample loginfo = new LogInfoExample();
 	
 	private String statusInfo = "";
 	
@@ -64,6 +66,7 @@ public class PackModeController {
 	@Inject
 	public void setPackModeService(IPackModeService packModeService) {
 		this.packModeService = packModeService;
+		loginfoHandler.setPackModeService(packModeService);
 	}
 	public IPersonSerivce getPersonservice() {
 		return personservice;
@@ -71,6 +74,7 @@ public class PackModeController {
 	@Inject
 	public void setPersonservice(IPersonSerivce personservice) {
 		this.personservice = personservice;
+		loginfoHandler.setPersonservice(personservice);
 	}
 	public IlogInfoService getLoginfoservice() {
 		return loginfoservice;
@@ -78,6 +82,7 @@ public class PackModeController {
 	@Inject
 	public void setLoginfoservice(IlogInfoService loginfoservice) {
 		this.loginfoservice = loginfoservice;
+		loginfoHandler.setLoginfoservice(loginfoservice);
 	}
 	
 	@RequestMapping(value="getallpackmode",method = RequestMethod.GET)
@@ -89,12 +94,16 @@ public class PackModeController {
 		Pager<PackMode> listpackmode = new Pager<PackMode>(packmodelist.size(),
 				packmodelist);
 		model.addAttribute("packmodelist", listpackmode);
+		if(statusInfo!=""){
+			model.addAttribute("errorinfo", statusInfo);
+			statusInfo = "";
+		}
 		}
 		return "packmode/list";
 	}
 	
 	@RequestMapping(value="uploadfile/{id}",method = RequestMethod.POST)
-	public @ResponseBody Object pack(Model model, @PathVariable int id, HttpSession session,@RequestParam MultipartFile file,HttpServletRequest request){
+	public @ResponseBody Object uploadfile(Model model, @PathVariable int id, HttpSession session,@RequestParam MultipartFile file,HttpServletRequest request){
 			ajaxMsg.clear();
 			PackMode packmode = packModeService.selectByPrimaryKey(id);
 			if(packmode==null){
@@ -120,8 +129,10 @@ public class PackModeController {
 			}
 			packmode.setPlatformLocalPath(dir.getAbsolutePath());
 			packModeService.updateByPrimaryKey(packmode);
-		
 			ajaxMsg.addHeader(MsgType.SUCCESS, "上传成功");
+			
+			//新建日志
+			loginfoHandler.insert((int)session.getAttribute("userid"), id, "成功将文件："+fileName+"上传到服务器");
 			
 		return ajaxMsg;
 	}
@@ -129,9 +140,10 @@ public class PackModeController {
 	@RequestMapping(value="updatestatus/{id}",method = RequestMethod.GET)
 	public @ResponseBody Object updatestatus(Model model, @PathVariable int id, HttpSession session){
 		ajaxMsg.clear();
-		PackMode packmode = packModeService.selectByPrimaryKey(id);
 		IPackWorker packworker = packWorkerManager.getPackWorker(id);
-		if(packmode!=null && packworker!=null){
+		PackMode packmode = packModeService.selectByPrimaryKey(id);
+		if(packmode!=null){
+		if(packworker!=null){
 			ajaxMsg.addHeader(MsgType.SUCCESS, "请求成功");
 			ajaxMsg.addData("id", id);
 			ajaxMsg.addData("loginfo", packworker.getLogInfo());
@@ -143,12 +155,22 @@ public class PackModeController {
 			ajaxMsg.addData("id", id);
 			ajaxMsg.addHeader(MsgType.ERROR, "打包失败");
 		}
+		}else{
+			ajaxMsg.addHeader(MsgType.ERROR, "打包失败");
+		}
 		return ajaxMsg;
 	}
 	
 	@RequestMapping(value="delete/{id}",method = RequestMethod.GET)
 	public @ResponseBody Object delete(Model model, @PathVariable int id, HttpSession session){
 		ajaxMsg.clear();
+		int userid = (int)session.getAttribute("userid");
+		Person person = personservice.selectByPrimaryKey(userid);
+		int permission = person.getPermission();
+		if(permission!=1){
+			ajaxMsg.addHeader(MsgType.ERROR, "权限不足");
+			return ajaxMsg;
+		}
 		if(id > ParameterConstants.ZERO){
 			packModeService.deleteByPrimaryKey(id);
 			ajaxMsg.addHeader(MsgType.SUCCESS, "删除成功");
@@ -167,10 +189,18 @@ public class PackModeController {
 	
 	@RequestMapping(value = "add", method = RequestMethod.POST)
 	public String addPost(@Valid PackMode packmode,
-			BindingResult br, Model model) {
+			BindingResult br, Model model,HttpSession session) {
 		if (br.hasErrors()) {
-			return "packmode/add";
+			statusInfo = "发生未知错误";
+			return "redirect:/packmode/getallpackmode.do";
 		}	
+		int userid = (int)session.getAttribute("userid");
+		Person person = personservice.selectByPrimaryKey(userid);
+		int permission = person.getPermission();
+		if(permission!=1){
+			statusInfo = "权限不足";
+			return "redirect:/packmode/getallpackmode.do";
+		}
 		packModeService.insert(packmode);
 		return "redirect:/packmode/getallpackmode.do";
 	}
@@ -206,12 +236,7 @@ public class PackModeController {
 			packmode.setId(id);
 			packmode.setStatus(1);
 			if(packmode.getIsSvnCheck()==1){
-		      	String path = PackWorkerManager.packUtilsPath+"/"+"LambdaPRO_"+id;   
-		        File dir = new File(path);          
-		        if(dir.exists()){  
-		            FileUtils.delFolder(path); 
-		        }
-		        dir.mkdir();
+		      	final String path = PackWorkerManager.packUtilsPath+"/"+"LambdaPRO_"+id;   
 		        packmode.setPlatformLocalPath(path);
 			}else{
 				packmode.setPlatformLocalPath(tpackmode.getPlatformLocalPath());
@@ -226,16 +251,18 @@ public class PackModeController {
 				}
 				packWorkerManager.removePackWorker(id);
 			}
-
+			
 			//開始调用异步打包
 			packworker = packWorkerManager.createPackWorker(packmode,person,packModeService,"F:/dsp/dabao/web/packManagement/WebContent/resources/platfrom");
 			packWorkerManager.packWorkerWorking(packworker);
+			//新建日志
+			loginfoHandler.insert((int)session.getAttribute("userid"), id, "进行打安装包操作");
 		}
 		return "redirect:/packmode/getallpackmode.do";
 	}
 	
 	@RequestMapping(value = "download/{id}", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<byte[]> downInstallPackFile(@PathVariable("id") int id){
+	public @ResponseBody ResponseEntity<byte[]> downInstallPackFile(@PathVariable("id") int id,HttpSession session){
 		IPackWorker packwork = PackWorkerManager.getInstance().getPackWorker(id);
 		if(packwork==null){
 			return null;
@@ -250,6 +277,8 @@ public class PackModeController {
 				headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 				headers.setContentDispositionFormData("attachment", dfileName);
 				entity = new ResponseEntity<byte[]>(org.apache.commons.io.FileUtils.readFileToByteArray(file), headers, HttpStatus.CREATED);  
+				//新建日志
+				loginfoHandler.insert((int)session.getAttribute("userid"), id, "下载了安装包文件");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

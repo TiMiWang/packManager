@@ -40,26 +40,24 @@ function callback_update_status_pack()
               var id = objResults.data.id;
               if(code==200)
             	  {
-                  var status = objResults.data.status;
                   var loginfo = objResults.data.loginfo;
                   var issuccess = objResults.data.issuccess;
+                  var status = objResults.data.status;
                   
             	  $("#status"+id).text("正在打包，进度:"+loginfo);
-            	  if(status==2){
-            		  if(issuccess == true){
-                		  $("#status"+id).text("打包完成");
-                		  $("#status"+id).append("<a href=\"<%=request.getContextPath() %>/packmode/download/"+id+".do\"> 点击下载</a>");
-                    	  jBox.tip("打包完成"); 
-            		  }else{
-            			  $("#status"+id).text("打包失败");
-            		  }
-
-                	  if(timerDict["timer"+id]!=null){
-                		  clearInterval(timerDict["timer"+id]);
-                	  }
+                  if(status==2){
+           		  if(issuccess == true){
+               		  $("#status"+id).text("打包完成");
+               		  $("#status"+id).append("<a href=\"<%=request.getContextPath() %>/packmode/download/"+id+".do\"> 点击下载</a>");
+                   	  jBox.tip("打包完成"); 
+           		  }else{
+           			  $("#status"+id).text("打包失败");
+           		  }
+               	  if(timerDict["timer"+id]!=null){
+               		  clearInterval(timerDict["timer"+id]);
+               	  }
             	  }
-            	  }
-              else
+            	  }else
             	  {
             	  jBox.tip(message); 
             	  if(timerDict["timer"+id]!=null){
@@ -198,6 +196,9 @@ function addPackMode(){
 }
 
 $(function(){
+	if("${errorinfo}"!=""){
+		alert("${errorinfo}");
+	}
  	
     function stringify(json,space)
    	{
@@ -280,7 +281,7 @@ $(function(){
 										<th>是否SVN签出</th>
 										<th>SVN地址</th>
 										<th>是否试用版</th>
-										<th>有效期</th>
+										<th>有效期(天)</th>
 										<th>系统版本</th>
 										<th>架构</th>
 					<!-- 				<th>是否更新秘钥</th>
@@ -381,7 +382,6 @@ $(function(){
 												 <c:if test="${packmodelist.total > 0}">
 													<jsp:include page="/pager.jsp">
 														<jsp:param value="${packmodelist.total }" name="totalRecord"/>
-														<jsp:param value="selectTmallRecord.do" name="url"/>
 													</jsp:include>
 												</c:if> 
 											</td>

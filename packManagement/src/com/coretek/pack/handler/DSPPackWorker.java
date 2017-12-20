@@ -13,6 +13,7 @@ public class DSPPackWorker implements IPackWorker {
 	
 
 	private String LogInfo = "开始打包流程";
+	private static String SVNPATH = "C:/Program Files (x86)/Subversion/bin"; 
 
 	private boolean isRunning = false;
 	private boolean isSuccess = false;
@@ -48,34 +49,43 @@ public class DSPPackWorker implements IPackWorker {
 			/*********************/
 			if(packmode.getIsSvnCheck()==1){
 				LogInfo = "开始svn下载";
-				exportPlatformFromSVN(packmode.getSvnNetPath(),packmode.getPlatformLocalPath());
-				LogInfo = "完成svn下载";
+				boolean status = exportPlatformFromSVN(packmode.getSvnNetPath(),packmode.getPlatformLocalPath());
+				if(status){
+					LogInfo = "完成svn下载";
+				}else{
+					LogInfo = "svn下载失败";
+					isSuccess = false;
+					packmode.setStatus(2);
+					return;
+				}
 			}else{
 				LogInfo = "开始解压平台";
 				//此时packmode.getPlatformLocalPath()为压缩包路径
 				File platformFile = new File(packmode.getPlatformLocalPath());
 		        if(platformFile.exists()){
+		        	FileUtils.delAllFile(packmode.getPlatformLocalPath());
 		        	FileUtils.zipToFile(platformFile.getAbsolutePath(), platformFile.getParent());
 		        	FileUtils.delFile(platformFile.getAbsolutePath());
 		        	packmode.setPlatformLocalPath(platformFile.getParent());
+		        	LogInfo = "完成平台解压";
 		        }else{
 		        	LogInfo = "解压包不存在，打包失败";
 					isSuccess = false;
-					packmode.setStatus(3);
+					packmode.setStatus(2);
 		        	return; 
 		        }
-		        prePlatformPath = packmode.getPlatformLocalPath()+"/"+"platform";
-		        preSrcPath = packmode.getPlatformLocalPath()+"/"+"src";
-		        LogInfo = "完成平台解压";
-		        if(!new File(prePlatformPath).exists()){
-		        	LogInfo = "平台路径不存在";
-		        	return;
-		        }
-		        if(!new File(preSrcPath).exists()){
-		        	LogInfo = "源码路径不存在";
-		        	return;
-		        }
 			}
+			
+	        prePlatformPath = packmode.getPlatformLocalPath()+"/"+"platform";
+	        preSrcPath = packmode.getPlatformLocalPath()+"/"+"src";
+	        if(!new File(prePlatformPath).exists()){
+	        	LogInfo = "平台路径不存在";
+	        	return;
+	        }
+	        if(!new File(preSrcPath).exists()){
+	        	LogInfo = "源码路径不存在";
+	        	return;
+	        }
 			
 			LogInfo = "开始构建插件";
 			boolean status = buildPlugins(preSrcPath+"/"+"tool/host/ide/src",prePlatformPath+"/LambdaIDE/eclipse",packmode.getId());
@@ -84,7 +94,7 @@ public class DSPPackWorker implements IPackWorker {
 			}else{
 				LogInfo = "构建插件失败";
 				isSuccess = false;
-				packmode.setStatus(3);
+				packmode.setStatus(2);
 				return;
 			}
 			LogInfo = "开始构建依赖库";
@@ -94,7 +104,7 @@ public class DSPPackWorker implements IPackWorker {
 			}else{
 				LogInfo = "构建依赖库失败";
 				isSuccess = false;
-				packmode.setStatus(3);
+				packmode.setStatus(2);
 				return;
 			}
 			LogInfo = "开始加密平台";
@@ -104,7 +114,7 @@ public class DSPPackWorker implements IPackWorker {
 			}else{
 				LogInfo = "平台加密失败";
 				isSuccess = false;
-				packmode.setStatus(3);
+				packmode.setStatus(2);
 				return;
 			}
 			LogInfo = "开始平台打安装包";
@@ -116,7 +126,7 @@ public class DSPPackWorker implements IPackWorker {
 			}else{
 				LogInfo = "打安装包失败";
 				isSuccess = false;
-				packmode.setStatus(3);
+				packmode.setStatus(2);
 			}
 			LogInfo = "结束平台安装包打包";
 			/*********************/
@@ -134,9 +144,15 @@ public class DSPPackWorker implements IPackWorker {
 			String exportLocalPath) {
 		boolean status = true;
 		File exportFile = new File(exportLocalPath);
-		try {		
-			String[] commands = {System.getenv("SVN_PATH")+"/svn.exe","export",svnNetPath,"--username",person.getSvnUsername(),"--password",person.getSvnPassword()};
-			ProcessBuilder processtest = new ProcessBuilder(commands);
+		if(!exportFile.exists()){
+			exportFile.mkdirs();
+		}
+		FileUtils.delAllFile(exportLocalPath);
+		try {
+			//导出src
+			LogInfo = "从SVN导出src目录";
+			String[] commandSrc = {SVNPATH+"/svn.exe","export",svnNetPath+"/src","--username",person.getSvnUsername(),"--password",person.getSvnPassword()};
+			ProcessBuilder processtest = new ProcessBuilder(commandSrc);
 			processtest.directory(exportFile);
 			processtest.redirectErrorStream(true);
 			Process process;
@@ -144,6 +160,25 @@ public class DSPPackWorker implements IPackWorker {
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					process.getInputStream()));
 			String line = br.readLine();
+			while (line != null) {
+				System.out.print(line);
+				line = br.readLine();
+			}
+			if ((process.waitFor() != 0)) {
+				System.out.println("error");
+				status = false;
+				return status;
+			}
+			//导出src
+			LogInfo = "从SVN导出platform目录";
+			String[] commandPlatform = {SVNPATH+"/svn.exe","export",svnNetPath+"/platform","--username",person.getSvnUsername(),"--password",person.getSvnPassword()};
+			processtest = new ProcessBuilder(commandPlatform);
+			processtest.directory(exportFile);
+			processtest.redirectErrorStream(true);
+			process = processtest.start();
+			br = new BufferedReader(new InputStreamReader(
+					process.getInputStream()));
+			line = br.readLine();
 			while (line != null) {
 				System.out.print(line);
 				line = br.readLine();
@@ -274,6 +309,7 @@ public class DSPPackWorker implements IPackWorker {
 		DSPPlatformPackHandler handler = new DSPPlatformPackHandler(destInstallProjectPath);
 		LogInfo = "拷贝平台到打包项目路径下";
 		handler.copyPlatform2installerPath(platformPath);
+		LogInfo = "开始生成安装包操作";
 		status = handler.installPackRun();
 		if(status){
 			LogInfo = "打安装包成功";

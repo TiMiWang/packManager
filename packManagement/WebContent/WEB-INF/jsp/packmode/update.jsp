@@ -85,12 +85,12 @@ function onprogress(evt){
 	}
 	
 function submit_pack(){
-	if("${packmode.isSvnCheck}"=="0"){
+	if($("#svnchenck_id").val()=="0"){
 		if($("#son").html()!="100%"){
 			alert("请先上传本地平台");
 			return;
 		}
-	}else if("${packmode.svnNetPath}".indexOf("LambdaPRO")==-1){
+	}else if($("#svnpath_id").val().indexOf("LambdaPRO")==-1){
 		alert("请完善svn路径信息");
 		return;
 	}
@@ -190,7 +190,7 @@ function callback_upload()
 								<div>
 									<sf:input id="svnchenck_id" path="isSvnCheck" onblur="Cmdusername(this)" placeholder="是否SVN签出" style="display:none"/>
 									<!--<sf:errors  path="isSvnCheck"/>-->
-									<select id="svnchenckid" style="width:150px" onchange="svnCheck_change(this)"> 
+									<select id="svnchenckid" style="width:180px" onchange="svnCheck_change(this)"> 
 									<option value="1">是</option> 
 									<option value="0">否</option> 
 									</select> 
@@ -203,7 +203,7 @@ function callback_upload()
 							<td width="100"><label>SVN地址: </label></td>					
 							<td>
 								<div>
-									<sf:input id="svnpath_id" path="svnNetPath" style="width:150px"  onblur="Cmdusername(this)" placeholder="SVN地址"/>
+									<sf:input id="svnpath_id" path="svnNetPath" style="width:180px"  onblur="Cmdusername(this)" placeholder="SVN地址"/>
 									<sf:errors  path="svnNetPath"/>
 								</div>
 							</td>
@@ -216,7 +216,7 @@ function callback_upload()
 								<div>
 									<sf:input id="versioninfo_id" path="versionInfo" style="display:none"  onblur="Cmdusername(this)" placeholder="是否试用版"/>
 									<sf:errors  path="versionInfo"/>
-									<select id="versioninfid" style="width:150px" onchange="versioninfo_change(this)"> 
+									<select id="versioninfid" style="width:180px" onchange="versioninfo_change(this)"> 
 									<option value="0">是</option> 
 									<option value="1">否</option> 
 									</select> 
@@ -228,7 +228,7 @@ function callback_upload()
 							<td width="100"><label>有效期(天): </label></td>					
 							<td>
 								<div>
-									<sf:input path="indate" style="width:150px"  onblur="Cmdusername(this)" placeholder="有效期"/>
+									<sf:input path="indate" style="width:180px"  onblur="Cmdusername(this)" placeholder="有效期"/>
 									<sf:errors  path="indate"/>
 								</div>
 							</td>
@@ -240,7 +240,7 @@ function callback_upload()
 								<div>
 									<sf:input id="systemversion_id" path="systemVersion" style="display:none"  onblur="Cmdusername(this)" placeholder="系统版本"/>
 									<sf:errors  path="systemVersion"/>
-									<select id="systemversionid" style="width:150px" onchange="systemversion(this)"> 
+									<select id="systemversionid" style="width:180px" onchange="systemversion(this)"> 
 									</select> 
 								</div>
 							</td>
@@ -252,10 +252,37 @@ function callback_upload()
 								<div>
 									<sf:input id="structtype_id" path="structureType" style="display:none"  onblur="Cmdusername(this)" placeholder="架构"/>
 									<sf:errors  path="structureType"/>
-									<select id=structuretypeid style="width:150px" onchange="structuretype_change(this)"> 
+									<select id=structuretypeid style="width:180px" onchange="structuretype_change(this)"> 
 									<option value="dsp">DSP</option> 
 									<option value="x86">X86</option> 
 									</select> 
+								</div>
+							</td>
+							</tr >
+							<tr >		
+							<td width="100"><label>所属项目: </label></td>					
+							<td>
+								<div>
+									<sf:input id="project_name_id" path="projectName" style="width:180px"  onblur="Cmdusername(this)" placeholder="所属项目名称"/>
+									<sf:errors  path="projectName"/>
+								</div>
+							</td>
+							</tr >
+							<tr >		
+							<td width="100"><label>所属产品: </label></td>					
+							<td>
+								<div>
+									<sf:input id="product_name_id" path="productName" style="width:180px"  onblur="Cmdusername(this)" placeholder="所属产品名称"/>
+									<sf:errors  path="productName"/>
+								</div>
+							</td>
+							</tr >
+							<tr >		
+							<td width="100"><label>备注: </label></td>					
+							<td>
+								<div>
+									<sf:input id="remark_id" path="remark" style="width:180px"  onblur="Cmdusername(this)" placeholder="打包原因"/>
+									<sf:errors  path="remark"/>
 								</div>
 							</td>
 							</tr >

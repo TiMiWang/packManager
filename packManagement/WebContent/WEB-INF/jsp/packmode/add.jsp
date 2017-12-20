@@ -72,20 +72,11 @@ function CmdTime(obj){
 					<!-- #section:elements.form -->
 					
 						<table style="border-collapse:separate; border-spacing:10px;" >
-						<tr >				
-							<td width="100"><label>平台本地路径: </label></td>					
-							<td>
-								<div>
-									<sf:input type="file" path="platformLocalPath" style="width:150px"  onblur="Cmdusername(this)" placeholder="平台本地路径"/>
-									<sf:errors  path="platformLocalPath"/>
-								</div>
-							</td>
-							</tr >
 							<tr >		
 							<td width="100"><label>是否SVN签出: </label></td>					
 							<td>
 								<div>
-									<sf:input path="isSvnCheck" style="width:150px"  onblur="Cmdusername(this)" placeholder="是否SVN签出"/>
+									<sf:input placeholder="1:是,0:否" path="isSvnCheck" style="width:150px"  onblur="Cmdusername(this)"/>
 									<sf:errors  path="isSvnCheck"/>
 								</div>
 							</td>
@@ -100,21 +91,12 @@ function CmdTime(obj){
 								</div>
 							</td>
 							</tr >	
-														<tr >	
-							<td width="100"><label>平台SVN路径: </label></td>					
-							<td>
-								<div>
-									<sf:input path="platformSvnPath" style="width:150px"  onblur="Cmdusername(this)" placeholder="平台SVN路径"/>
-									<sf:errors  path="platformSvnPath"/>
-								</div>
-							</td>
-							</tr >	
 							
 							<tr >	
 							<td width="100"><label>是否试用版: </label></td>					
 							<td>
 								<div>
-									<sf:input path="versionInfo" style="width:150px"  onblur="Cmdusername(this)" placeholder="是否试用版"/>
+									<sf:input path="versionInfo" style="width:150px"  onblur="Cmdusername(this)" placeholder="1:是,0:否"/>
 									<sf:errors  path="versionInfo"/>
 								</div>
 							</td>
@@ -154,7 +136,7 @@ function CmdTime(obj){
 							<td width="100"><label>是否更新秘钥: </label></td>					
 							<td>
 								<div>
-									<sf:input path="isUpdateKey" style="width:150px"  onblur="Cmdusername(this)" placeholder="是否更新秘钥"/>
+									<sf:input path="isUpdateKey" style="width:150px"  onblur="Cmdusername(this)" placeholder="1:是,0:否"/>
 									<sf:errors  path="isUpdateKey"/>
 								</div>
 							</td>
@@ -164,7 +146,7 @@ function CmdTime(obj){
 							<td width="100"><label>是否更新UUID: </label></td>					
 							<td>
 								<div>
-									<sf:input path="isUpdateUuid" style="width:150px"  onblur="Cmdusername(this)" placeholder="是否更新UUID"/>
+									<sf:input path="isUpdateUuid" style="width:150px"  onblur="Cmdusername(this)" placeholder="1:是,0:否"/>
 									<sf:errors  path="isUpdateUuid"/>
 								</div>
 							</td>

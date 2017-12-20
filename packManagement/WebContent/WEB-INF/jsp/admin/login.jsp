@@ -25,7 +25,6 @@ body { background: url("<%=request.getContextPath() %>/resources/img/bg.jpg") }
 								<h4 class="blue" id="id-company-text"></h4>
 							</div>
 
-
 							<div class="space-6"></div>
 
 							<div class="position-relative">
@@ -81,7 +80,7 @@ body { background: url("<%=request.getContextPath() %>/resources/img/bg.jpg") }
 												</fieldset>
 											</form>
 										
-							<div class="navbar-fixed-top align-right">
+							<!--<div class="navbar-fixed-top align-right">
 								<br />
 								&nbsp;
 								<a id="btn-login-dark" href="#">Dark</a>
@@ -94,7 +93,7 @@ body { background: url("<%=request.getContextPath() %>/resources/img/bg.jpg") }
 								&nbsp;
 								<a id="btn-login-light" href="#">Light</a>
 								&nbsp; &nbsp; &nbsp;
-							</div>
+							</div>  -->
 						</div>
 					</div><!-- /.col -->
 				</div><!-- /.row -->
@@ -188,12 +187,10 @@ body { background: url("<%=request.getContextPath() %>/resources/img/bg.jpg") }
 			$(function() {
 				$("#myForm").cmsvalidate();
 			});
-		</script>
-		<title>后台管理登录</title>
-		<script type="text/javascript">
-			function reCheckcode(img) {
-				img.src = "drawCheckCode.do?" + Math.random();
+			var reCheckcode = function(img) {
+				img.src="drawCheckCode.do?"+Math.random();
 			}
 		</script>
+		<title>后台管理登录</title>
 	</body>
 </html>
