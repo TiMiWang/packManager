@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:web="http://java.sun.com/xml/ns/javaee" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
   <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>/login/index.do</welcome-file>
   </welcome-file-list>
   <context-param>
     <param-name>contextConfigLocation</param-name>
@@ -56,7 +56,7 @@
     <listener-class>com.bean.listener.ServerListener</listener-class>
   </listener>
   <welcome-file-list>
-    <welcome-file>/index.jsp</welcome-file>
+    <welcome-file>/login/index.do</welcome-file>
   </welcome-file-list>
   <session-config>
     <session-timeout>15</session-timeout>

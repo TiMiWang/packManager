@@ -54,7 +54,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 		String jarPath = platformPath
 				+ "/"
 				+ "LambdaIDE/eclipse/plugins/com.coretek.ide.system.core_1.0.0.jar";
-		File tempPMIdFile = new File(PackWorkerManager.packUtilsPath, ""
+		File tempPMIdFile = new File(PackWorkerManager.getInstance().packUtilsPath, ""
 				+ "temp" + "_" + packModeId);
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
@@ -106,7 +106,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 		if (!systemVersion.equals("")) {
 			fileStr = fileStr + "-" + systemVersion;
 		}
-		File tempPMIdFile = new File(PackWorkerManager.packUtilsPath, ""
+		File tempPMIdFile = new File(PackWorkerManager.getInstance().packUtilsPath, ""
 				+ "temp" + "_" + packModeId);
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
@@ -158,7 +158,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 		String jarPath = platformPath
 				+ "/"
 				+ "LambdaIDE/eclipse/plugins/com.coretek.ide.system.core_1.0.0.jar";
-		File tempPMIdFile = new File(PackWorkerManager.packUtilsPath, ""
+		File tempPMIdFile = new File(PackWorkerManager.getInstance().packUtilsPath, ""
 				+ "temp" + "_" + packModeId);
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
@@ -198,7 +198,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 	public boolean vidFileGEN(String arch, String systemVersion,
 			int versionInfo, int time, int packModeId) {
 		boolean status = true;
-		File tempPMIdFile = new File(PackWorkerManager.packUtilsPath, ""
+		File tempPMIdFile = new File(PackWorkerManager.getInstance().packUtilsPath, ""
 				+ "temp" + "_" + packModeId);
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());

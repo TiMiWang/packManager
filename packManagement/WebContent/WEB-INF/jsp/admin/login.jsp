@@ -58,7 +58,7 @@ body { background: url("<%=request.getContextPath() %>/resources/img/bg.jpg") }
 													<label class="block clearfix">
 														<span class="block input-icon input-icon-right">
 															<input type="text" class="form-control" placeholder="验证码" name="checkcode" />
-															<span style="cursor:pointer"> <img src="drawCheckCode.do" onclick="reCheckcode(this)" /></span>
+															<span style="cursor:pointer"> <img src="/login/drawCheckCode.do" onclick="reCheckcode(this)" /></span>
 														</span>
 													</label>
 

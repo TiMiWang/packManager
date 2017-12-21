@@ -100,7 +100,11 @@ $(function(){
 				<li class="active">日志信息</li>
 			</ul>		
 		</div>
-	    
+	    <div class="page-content">
+			系统版本：<input type="text" name="username" id="username" style="width:100px" value=""/>&nbsp;&nbsp;	
+			架构类型：<input type="text" name="structuretype" id="structuretype" style="width:100px" value=""/>&nbsp;&nbsp;	
+			<img src="<%=request.getContextPath() %>/resources/upload/chaxun.png" onclick="query()" id="searchButton" width="60" height="35">
+	    </div>
 		<div class="clear"></div>
 		<div class="page-content">
 			<div class="row">
@@ -114,8 +118,8 @@ $(function(){
 										<th>内容</th>
 										<th>用户名</th>
 										<th>架构</th>
-										<th>有效期</th>
-										<th>是否试用版</th>
+										<th>有效期(天)</th>
+										<th>版本</th>
 										<th>svn路径</th>
 										<th>所属项目名称</th>
 										<th>所属产品名称</th>
@@ -143,6 +147,22 @@ $(function(){
 								</tbody>
 							</table>
 							<div class="page-header position-relative">
+								<table style="width: 100%;">
+									<tbody>
+										<tr>
+											<td style="vertical-align: top;">					
+											<a href="<%=request.getContextPath() %>/loginfo/getallloginfo.do" style="color:#FFF;text-decoration:none;" class="btn btn-info fa fa-refresh" title="刷新列表"></a>
+											</td>
+											<td style="vertical-align: top;">
+												 <c:if test="${loginfolist.total > 0}">
+													<jsp:include page="/pager.jsp">
+														<jsp:param value="${loginfolist.total }" name="totalRecord"/>
+													</jsp:include>
+												</c:if> 
+											</td>
+										</tr>
+									</tbody>
+								</table>
 							</div>
 						</div>
 					</div>

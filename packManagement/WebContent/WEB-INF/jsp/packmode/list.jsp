@@ -264,7 +264,7 @@ $(function(){
 
 			系统版本：<input type="text" name="lname" id="lname" style="width:100px" value=""/>&nbsp;&nbsp;	
 			架构类型：<input type="text" name="laddress" id="laddress" style="width:100px" value=""/>&nbsp;&nbsp;	
-			 <img src="<%=request.getContextPath() %>/resources/upload/chaxun.png" onclick=" submit()" id="searchButton" width="60" height="35">
+			 <img src="<%=request.getContextPath() %>/resources/upload/chaxun.png" onclick="query()" id="searchButton" width="60" height="35">
 	
 	    </div>
 		<div class="clear"></div>

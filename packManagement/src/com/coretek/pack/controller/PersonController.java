@@ -23,6 +23,7 @@ import com.coretek.pack.page.SystemContext;
 import com.coretek.pack.service.IPersonSerivce;
 import com.coretek.pack.util.AjaxMsg;
 import com.coretek.pack.util.ConstantEnum.MsgType;
+import com.coretek.pack.util.FrontHelper;
 import com.coretek.pack.util.ParameterConstants;
 import com.coretek.pack.util.sessionContexts;
 @Controller
@@ -46,17 +47,23 @@ public class PersonController {
 	
 	@RequestMapping(value = "getallperson", method = RequestMethod.GET)
 	public String getAA(Model model) {
-		TeacherStatic=null;
+		
 		personExample.clear();
-		personExample.setPageNumber(10);
-		personExample.setPageSize(SystemContext.getPageSize());
+		personExample.setPageNumber(ParameterConstants.ZERO);
+		personExample.setPageSize(ParameterConstants.PageSizeConstantMax);
+		//总数
 		int count = personService.countByExample(personExample);
-		List<Person> TCustomerList = personService
-				.selectByExample(personExample);
-		Pager<Person> listTCustomer = new Pager<Person>(count,
-				TCustomerList);
+		
 		personExample.clear();
-		model.addAttribute("peronlist", listTCustomer);		
+		personExample.setPageNumber(SystemContext.getPageOffset());
+		personExample.setPageSize(SystemContext.getPageSize());
+
+		List<Person> peronlists = personService
+				.selectByExample(personExample);
+		Pager<Person> peronlist = new Pager<Person>(count,
+				peronlists);
+		personExample.clear();
+		model.addAttribute("peronlist", peronlist);		
 		return "person/list";
 	}
 	

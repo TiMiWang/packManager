@@ -8,10 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -31,6 +27,7 @@ import com.coretek.pack.model.PackModeExample;
 import com.coretek.pack.model.Person;
 import com.coretek.pack.model.PersonExample;
 import com.coretek.pack.page.Pager;
+import com.coretek.pack.page.SystemContext;
 import com.coretek.pack.service.IPackModeService;
 import com.coretek.pack.service.IPersonSerivce;
 import com.coretek.pack.service.IlogInfoService;
@@ -89,9 +86,23 @@ public class PackModeController {
 	public String getAllPackMode(Model model,HttpSession session){
 		session = sessionContexts.getSession(session.getId());
 		if(session!=null){
+			
+		PackWorkerManager.packBasePath = PackWorkerManager.getpackUtilsPath(session);
+		PackWorkerManager.packUtilsPath = PackWorkerManager.packBasePath+"/packUtils";
+		
+		packmodeexample.clear();
+		packmodeexample.setPageNumber(ParameterConstants.ZERO);
+		packmodeexample.setPageSize(ParameterConstants.PageSizeConstantMax);
+		//总数
+		int count = packModeService.countByExample(packmodeexample);
+		
+		packmodeexample.clear();
+		packmodeexample.setPageNumber(SystemContext.getPageOffset());
+		packmodeexample.setPageSize(SystemContext.getPageSize());
+		
 		packmodeexample.clear();
 		List<PackMode> packmodelist = packModeService.selectByExample(packmodeexample);
-		Pager<PackMode> listpackmode = new Pager<PackMode>(packmodelist.size(),
+		Pager<PackMode> listpackmode = new Pager<PackMode>(count,
 				packmodelist);
 		model.addAttribute("packmodelist", listpackmode);
 		if(statusInfo!=""){
@@ -253,7 +264,7 @@ public class PackModeController {
 			}
 			
 			//開始调用异步打包
-			packworker = packWorkerManager.createPackWorker(packmode,person,packModeService,"F:/dsp/dabao/web/packManagement/WebContent/resources/platfrom");
+			packworker = packWorkerManager.createPackWorker(packmode,person,packModeService,session.getServletContext().getRealPath("resources/platform"));
 			packWorkerManager.packWorkerWorking(packworker);
 			//新建日志
 			loginfoHandler.insert((int)session.getAttribute("userid"), id, "进行打安装包操作");
@@ -262,30 +273,54 @@ public class PackModeController {
 	}
 	
 	@RequestMapping(value = "download/{id}", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<byte[]> downInstallPackFile(@PathVariable("id") int id,HttpSession session){
+	public String downInstallPackFile(@PathVariable("id") int id,HttpSession session){
+		String visitPath = "";
 		IPackWorker packwork = PackWorkerManager.getInstance().getPackWorker(id);
 		if(packwork==null){
 			return null;
 		}
 		String installPackPath = packwork.getoutputpackpath();
-		ResponseEntity<byte[]> entity = null;
-		try {
-			File file = new File(installPackPath,"Setup.exe");  
-			if(file.exists()){
-				String dfileName = new String(file.getName().getBytes("gb2312"), "iso8859-1");
-				HttpHeaders headers = new HttpHeaders();  
-				headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-				headers.setContentDispositionFormData("attachment", dfileName);
-				entity = new ResponseEntity<byte[]>(org.apache.commons.io.FileUtils.readFileToByteArray(file), headers, HttpStatus.CREATED);  
-				//新建日志
-				loginfoHandler.insert((int)session.getAttribute("userid"), id, "下载了安装包文件");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}  
-		return entity;  
+		File file = new File(installPackPath,"Setup.exe");  
+		if(file.exists()){	
+		String resourcesPath = file.getAbsolutePath();
+		resourcesPath = resourcesPath.replace("\\", "/");
+		visitPath = resourcesPath.substring(resourcesPath.indexOf("resources/platform"),resourcesPath.length()); 
+		//新建日志
+		String userid = session.getAttribute("userid")+"";
+		if(userid!=""){
+			loginfoHandler.insert(Integer.parseInt(userid), id, "下载了安装包文件");
+		}
+		}
+		System.out.println("输出路径："+visitPath);
+		return "redirect:/"+visitPath;  
 		
 	} 
+	
+//	@RequestMapping(value = "download/{id}", method = RequestMethod.GET)
+//	public @ResponseBody ResponseEntity<byte[]> downInstallPackFile(@PathVariable("id") int id,HttpSession session){
+//		IPackWorker packwork = PackWorkerManager.getInstance().getPackWorker(id);
+//		if(packwork==null){
+//			return null;
+//		}
+//		String installPackPath = packwork.getoutputpackpath();
+//		ResponseEntity<byte[]> entity = null;
+//		try {
+//			File file = new File(installPackPath,"Setup.exe");  
+//			if(file.exists()){
+//				String dfileName = new String(file.getName().getBytes("gb2312"), "iso8859-1");
+//				HttpHeaders headers = new HttpHeaders();  
+//				headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+//				headers.setContentDispositionFormData("attachment", dfileName);
+//				entity = new ResponseEntity<byte[]>(org.apache.commons.io.FileUtils.readFileToByteArray(file), headers, HttpStatus.CREATED);  
+//				//新建日志
+//				loginfoHandler.insert((int)session.getAttribute("userid"), id, "下载了安装包文件");
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}  
+//		return entity;  
+//		
+//	} 
 	
 
 }

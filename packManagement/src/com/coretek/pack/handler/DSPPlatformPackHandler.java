@@ -8,7 +8,7 @@ import com.coretek.pack.util.FileUtils;
 
 public class DSPPlatformPackHandler implements IPlatformPackHandler {
 
-	private String installerEXEPath = "F:/dsp/dabao/IS12/System/";
+	private String installerEXEPath = PackWorkerManager.packBasePath+"/IS12/System/";
 	private String cmdEXEName = "IsCmdBld.exe";
 	private String projectName = "LambdPRO6.0-v12.ism";
 

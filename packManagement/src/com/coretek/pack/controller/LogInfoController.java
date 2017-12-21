@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.coretek.pack.model.LogInfo;
 import com.coretek.pack.model.LogInfoExample;
 import com.coretek.pack.page.Pager;
+import com.coretek.pack.page.SystemContext;
 import com.coretek.pack.service.IPackModeService;
 import com.coretek.pack.service.IPersonSerivce;
 import com.coretek.pack.service.IlogInfoService;
+import com.coretek.pack.util.ParameterConstants;
 
 @Controller
 @RequestMapping("loginfo")
@@ -24,6 +26,8 @@ public class LogInfoController {
 	IlogInfoService loginfoService;
 	IPackModeService packmodeService;
 	IPersonSerivce personService;
+	
+	LogInfoExample loginfoexample = new LogInfoExample();
 	
 	public IPackModeService getPackmodeService() {
 		return packmodeService;
@@ -52,13 +56,29 @@ public class LogInfoController {
 		this.loginfoService = loginfoService;
 	}
 
-
+	/**
+	 * 分页已实现
+	 * 要修改 Mapping.xml文件， 增加    <if test="pageNumber != null" >
+     * 						limit ${pageNumber},${pageSize}
+     *						</if>
+	 * @param session
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value="getallloginfo",method = RequestMethod.GET)
 	public String getallloginfo(HttpSession session,Model model){
-		LogInfoExample loginfoexample = new LogInfoExample();
 		loginfoexample.clear();
+		loginfoexample.setPageNumber(ParameterConstants.ZERO);
+		loginfoexample.setPageSize(ParameterConstants.PageSizeConstantMax);
+		//总数
+		int count = loginfoService.countByExample(loginfoexample);
+		
+		loginfoexample.clear();
+		loginfoexample.setPageNumber(SystemContext.getPageOffset());
+		loginfoexample.setPageSize(SystemContext.getPageSize());
+		loginfoexample.setOrderByClause("date_time desc");
 		List<LogInfo> loginfolist =  loginfoService.selectByExample(loginfoexample);
-		Pager<LogInfo> listloginfo = new Pager<LogInfo>(loginfolist.size(),
+		Pager<LogInfo> listloginfo = new Pager<LogInfo>(count,
 				loginfolist);
 		model.addAttribute("loginfolist",listloginfo);
 		return "loginfo/list";

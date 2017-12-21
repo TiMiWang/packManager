@@ -95,15 +95,6 @@ function callback()
             } 
         }
 }
-//触发事件
-function onCardlogochanged(carlogoId)
-{
-    // retrieve the JSON text from the local file.
-     var url = "getCartypeByLogoId/"+carlogoId;
-    xmlhttp.open("GET", url, true);
-    xmlhttp.onreadystatechange = callback;
-    xmlhttp.send(null);
-}
 
 
 function windowOpen2(url)

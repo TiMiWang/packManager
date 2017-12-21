@@ -13,7 +13,7 @@ public class DSPPackWorker implements IPackWorker {
 	
 
 	private String LogInfo = "开始打包流程";
-	private static String SVNPATH = "C:/Program Files (x86)/Subversion/bin"; 
+	private static String SVNPATH = PackWorkerManager.packBasePath+"/Subversion/bin"; 
 
 	private boolean isRunning = false;
 	private boolean isSuccess = false;
@@ -288,14 +288,14 @@ public class DSPPackWorker implements IPackWorker {
 	@Override
 	public boolean platformPack(String platformPath, String platfomPackPath,int packModeId) {
 		boolean status = true;
-		final File tempPMIdFile = new File(PackWorkerManager.packUtilsPath, ""
+		final File tempPMIdFile = new File(PackWorkerManager.getInstance().packUtilsPath, ""
 				+ "temp" + "_" + packModeId);
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
 		}
 		tempPMIdFile.mkdirs();
 		try{
-		String templatInstallProjectPath = PackWorkerManager.packUtilsPath+"/installPackage"+"/LambdPRO6.0-v12-DSP";
+		String templatInstallProjectPath = PackWorkerManager.getInstance().packUtilsPath+"/installPackage"+"/LambdPRO6.0-v12-DSP";
 		String destInstallProjectPath = tempPMIdFile+"/"+"LambdPRO6.0-v12-DSP";
 		if(!new File(destInstallProjectPath).exists()){
 			new File(destInstallProjectPath).mkdirs();

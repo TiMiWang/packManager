@@ -4,12 +4,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
-
-
-
-import sun.text.resources.FormatData;
-
 import com.coretek.pack.model.LogInfo;
 import com.coretek.pack.model.PackMode;
 import com.coretek.pack.model.Person;

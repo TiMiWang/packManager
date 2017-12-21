@@ -1,12 +1,12 @@
 package com.coretek.pack.handler;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.servlet.http.HttpSession;
 
 import com.coretek.pack.model.PackMode;
 import com.coretek.pack.model.Person;
@@ -14,7 +14,8 @@ import com.coretek.pack.service.IPackModeService;
 
 public class PackWorkerManager implements IPackWorkerManager{
 	
-	public static String packUtilsPath = "F:/dsp/dabao/packUtils";
+	public static String packBasePath = "F:/dsp/dabao";
+	public static String packUtilsPath = packBasePath+"/packUtils";
 
 	private static PackWorkerManager packworkermanager = null;
 	
@@ -30,6 +31,17 @@ public class PackWorkerManager implements IPackWorkerManager{
 		}
 		return packworkermanager;
 		
+	}
+	
+	
+	public static String getpackUtilsPath(HttpSession session){
+		String basePath = "";
+		basePath = session.getServletContext().getRealPath("resources");
+		File file = new File(basePath);
+		file = file.getParentFile();
+		file = file.getParentFile();
+		basePath = file.getParent();
+		return basePath;
 	}
 	
 	/**
