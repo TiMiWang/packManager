@@ -262,17 +262,22 @@ $(function(){
 										<tr>
 											<td>${person.name }</td>
 											<td>${person.password }</td>
-											<td>${person.permission }</td>
+											<td id="permission${person.id}">${person.permission }</td>
 											<td>${person.svnUsername }</td>
 											<td>${person.svnPassword }</td>
-												
 											<td>																							
 										 <a class="btn btn-xs btn-info" onclick="show('${person.id}')" title="编辑">
 															<i class="ace-icon fa fa-pencil bigger-120"></i>
-													</a>
-													
-																						
-											</td>		 								
+													</a>										
+											</td>
+											<script type="text/javascript">
+											if("${person.permission}"==0)
+											{
+												$("#permission${person.id}").text("开发人员");
+											}else if("${person.permission}"==1){
+												$("#permission${person.id}").text("管理人员");
+											}
+											</script>		 								
 										</tr>
 									</c:forEach>
 										

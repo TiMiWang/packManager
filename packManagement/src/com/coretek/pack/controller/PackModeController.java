@@ -88,6 +88,7 @@ public class PackModeController {
 		if(session!=null){
 			
 		PackWorkerManager.packBasePath = PackWorkerManager.getpackUtilsPath(session);
+//		PackWorkerManager.packBasePath = "E:/apache-tomcat-7.0.77";
 		PackWorkerManager.packUtilsPath = PackWorkerManager.packBasePath+"/packUtils";
 		
 		packmodeexample.clear();

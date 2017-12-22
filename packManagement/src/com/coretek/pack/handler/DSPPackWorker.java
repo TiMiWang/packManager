@@ -127,6 +127,7 @@ public class DSPPackWorker implements IPackWorker {
 				LogInfo = "打安装包失败";
 				isSuccess = false;
 				packmode.setStatus(2);
+				return;
 			}
 			LogInfo = "结束平台安装包打包";
 			/*********************/
@@ -295,7 +296,7 @@ public class DSPPackWorker implements IPackWorker {
 		}
 		tempPMIdFile.mkdirs();
 		try{
-		String templatInstallProjectPath = PackWorkerManager.getInstance().packUtilsPath+"/installPackage"+"/LambdPRO6.0-v12-DSP";
+		String templatInstallProjectPath = PackWorkerManager.packUtilsPath+"/installPackage"+"/LambdPRO6.0-v12-DSP";
 		String destInstallProjectPath = tempPMIdFile+"/"+"LambdPRO6.0-v12-DSP";
 		if(!new File(destInstallProjectPath).exists()){
 			new File(destInstallProjectPath).mkdirs();

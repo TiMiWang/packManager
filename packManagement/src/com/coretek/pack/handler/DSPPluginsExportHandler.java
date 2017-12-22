@@ -59,7 +59,7 @@ public class DSPPluginsExportHandler implements IPluginsExportHandler{
 	public boolean ExportRun(String buildXmlPath) {
 		boolean status = true;
 		try {
-			String[] commands = {PackWorkerManager.packBasePath+"ant/bin/ant.bat"};
+			String[] commands = {PackWorkerManager.packBasePath+"/ant/bin/ant.bat"};
 			ProcessBuilder processtest = new ProcessBuilder(commands);
 			processtest.directory(new File(buildXmlPath));
 			processtest.redirectErrorStream(true);

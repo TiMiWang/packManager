@@ -51,10 +51,11 @@ function callback_update_status_pack()
                		  $("#status"+id).append("<a href=\"<%=request.getContextPath() %>/packmode/download/"+id+".do\"> 点击下载</a>");
                    	  jBox.tip("打包完成"); 
            		  }else{
-           			  $("#status"+id).text("打包失败");
+           			  $("#status"+id).text("打包失败,失败原因:"+loginfo);
            		  }
                	  if(timerDict["timer"+id]!=null){
                		  clearInterval(timerDict["timer"+id]);
+               		  timerDict["timer"+id] = null;
                	  }
             	  }
             	  }else
@@ -62,6 +63,7 @@ function callback_update_status_pack()
             	  jBox.tip(message); 
             	  if(timerDict["timer"+id]!=null){
             		  clearInterval(timerDict["timer"+id]);
+            		  timerDict["timer"+id] = null;
             	  }
             	  }
             } 
@@ -303,12 +305,13 @@ $(function(){
 <%-- 										<td id="updatekey${packmode.id}">${packmode.isUpdateKey }</td>
 											<td id="updateuuid${packmode.id}">${packmode.isUpdateUuid }</td> --%>
 											<td id= "status${packmode.id}">${packmode.status }</td>
-											<script>
+											<script type="text/javascript">
 											if("${packmode.status}"==0)
 											{
 												$("#status${packmode.id}").text("可使用");
 												if(timerDict["timer${packmode.id}"]!=null){
 													clearInterval(timerDict["timer${packmode.id}"]);
+													timerDict["timer${packmode.id}"] = null;
 												}
 											}else if("${packmode.status}"==1){
 												$("#status${packmode.id}").text("正在使用");
@@ -326,6 +329,7 @@ $(function(){
 												$("#status${packmode.id}").text("打包失败");
 												if(timerDict["timer${packmode.id}"]!=null){
 													clearInterval(timerDict["timer${packmode.id}"]);
+													timerDict["timer${packmode.id}"] = null;
 												}
 											}
 											if("${packmode.isSvnCheck}"==1)
