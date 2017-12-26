@@ -340,7 +340,7 @@
 </div>
 <script type="text/javascript">
 function exitSystem() {
-	window.parent.location.href = $("#contextPath").val()+ "/loginController/logout.do";
+	window.parent.location.href = $("#contextPath").val()+ "/login/logout.do";
 }
 </script>
 <!-- /section:basics/navbar.layout -->

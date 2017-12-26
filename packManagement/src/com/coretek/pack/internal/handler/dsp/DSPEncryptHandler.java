@@ -1,4 +1,4 @@
-package com.coretek.pack.handler;
+package com.coretek.pack.internal.handler.dsp;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
+import com.coretek.pack.internal.handler.PackWorkerManager;
+import com.coretek.pack.internal.ihandler.IEncryptHandler;
 import com.coretek.pack.util.FileUtils;
 
 public class DSPEncryptHandler implements IEncryptHandler{
@@ -20,24 +22,12 @@ public class DSPEncryptHandler implements IEncryptHandler{
 	public boolean cleanTempFiles() {
 		boolean status = true;
 		File workspaceFile = new File(platformPath, "workspace");
-		File tsFile = new File(platformPath, "host/pub/ts");
-		File configureFile = new File(platformPath,
-				"LambdaIDE/eclipse/configuration");
 		File vidDatFile = new File(
 				platformPath,
-				"host/ide/LambdaPRO/eclipse/plugins/com.coretek.tools.ide.configManager_1.0.0/vid.dat");
-		File bochsConnectionsFile = new File(platformPath,
-				"host/pub/bochsConnections");
-		File spawnerFile = new File(
-				platformPath,
-				"host/ide/tools/eclipse/plugins/org.eclipse.cdt.core.win32_5.2.0.201102110609/os/win32/x86/spawner.dat");
+				"LambdaIDE/eclipse/plugins/com.ti.ccstudio.base_6.2.1.01781/vid.dat");
 		try {
 			FileUtils.delAllFile(workspaceFile.getAbsolutePath());
-			FileUtils.delAllFile(tsFile.getAbsolutePath());
-			FileUtils.delAllFile(configureFile.getAbsolutePath());
-			FileUtils.delAllFile(bochsConnectionsFile.getAbsolutePath());
 			FileUtils.delFile(vidDatFile.getAbsolutePath());
-			FileUtils.delFile(spawnerFile.getAbsolutePath());
 		} catch (Exception ex) {
 			ex.getStackTrace();
 			status = false;
@@ -54,7 +44,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 		String jarPath = platformPath
 				+ "/"
 				+ "LambdaIDE/eclipse/plugins/com.coretek.ide.system.core_1.0.0.jar";
-		File tempPMIdFile = new File(PackWorkerManager.getInstance().packUtilsPath, ""
+		File tempPMIdFile = new File(PackWorkerManager.packUtilsPath, ""
 				+ "temp" + "_" + packModeId);
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
@@ -106,7 +96,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 		if (!systemVersion.equals("")) {
 			fileStr = fileStr + "-" + systemVersion;
 		}
-		File tempPMIdFile = new File(PackWorkerManager.getInstance().packUtilsPath, ""
+		File tempPMIdFile = new File(PackWorkerManager.packUtilsPath, ""
 				+ "temp" + "_" + packModeId);
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
@@ -158,7 +148,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 		String jarPath = platformPath
 				+ "/"
 				+ "LambdaIDE/eclipse/plugins/com.coretek.ide.system.core_1.0.0.jar";
-		File tempPMIdFile = new File(PackWorkerManager.getInstance().packUtilsPath, ""
+		File tempPMIdFile = new File(PackWorkerManager.packUtilsPath, ""
 				+ "temp" + "_" + packModeId);
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
@@ -198,7 +188,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 	public boolean vidFileGEN(String arch, String systemVersion,
 			int versionInfo, int time, int packModeId) {
 		boolean status = true;
-		File tempPMIdFile = new File(PackWorkerManager.getInstance().packUtilsPath, ""
+		File tempPMIdFile = new File(PackWorkerManager.packUtilsPath, ""
 				+ "temp" + "_" + packModeId);
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());

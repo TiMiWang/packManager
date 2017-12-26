@@ -1,15 +1,18 @@
-package com.coretek.pack.handler;
+package com.coretek.pack.internal.handler.x86;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 
+import com.coretek.pack.internal.handler.PackWorkerManager;
+import com.coretek.pack.internal.ihandler.IPackWorker;
+import com.coretek.pack.internal.ihandler.IPluginsExportHandler;
 import com.coretek.pack.model.PackMode;
 import com.coretek.pack.model.Person;
 import com.coretek.pack.service.IPackModeService;
 import com.coretek.pack.util.FileUtils;
 
-public class DSPPackWorker implements IPackWorker {
+public class X86PackWorker implements IPackWorker {
 	
 
 	private String LogInfo = "开始打包流程";
@@ -25,7 +28,7 @@ public class DSPPackWorker implements IPackWorker {
 	private IPackModeService packModeService = null;
 	private Person person;
 
-	public DSPPackWorker(PackMode packmode,Person person,IPackModeService packModeService,String tempoutputpackpath) {
+	public X86PackWorker(PackMode packmode,Person person,IPackModeService packModeService,String tempoutputpackpath) {
 		this.packmode = packmode;
 		this.person = person;
 		this.packModeService = packModeService;
@@ -63,7 +66,7 @@ public class DSPPackWorker implements IPackWorker {
 				//此时packmode.getPlatformLocalPath()为压缩包路径
 				File platformFile = new File(packmode.getPlatformLocalPath());
 		        if(platformFile.exists()){
-		        	FileUtils.delAllFile(packmode.getPlatformLocalPath());
+		        	LogInfo = "进行解压平台操作";
 		        	FileUtils.zipToFile(platformFile.getAbsolutePath(), platformFile.getParent());
 		        	FileUtils.delFile(platformFile.getAbsolutePath());
 		        	packmode.setPlatformLocalPath(platformFile.getParent());
@@ -136,6 +139,7 @@ public class DSPPackWorker implements IPackWorker {
 		} finally {
 			packModeService.updateByPrimaryKey(packmode);
 			isRunning = false;
+			FileUtils.delFolder(packmode.getPlatformLocalPath());
 		}
 
 	}
@@ -148,6 +152,7 @@ public class DSPPackWorker implements IPackWorker {
 		if(!exportFile.exists()){
 			exportFile.mkdirs();
 		}
+		LogInfo = "清理svn历史记录";
 		FileUtils.delAllFile(exportLocalPath);
 		try {
 			//导出src
@@ -207,7 +212,7 @@ public class DSPPackWorker implements IPackWorker {
 		}
 		tempPMIdFile.mkdirs();
 		try{
-		IPluginsExportHandler handler = new DSPPluginsExportHandler();
+		IPluginsExportHandler handler = new X86PluginsExportHandler();
 		LogInfo = "开始生成配置文件";
 		String tempPluginXMLPath = tempPMIdFile+"/"+"pluginexport.xml";
 		String tempBuildXMLPath = tempPMIdFile+"/"+"build.xml";
@@ -244,7 +249,7 @@ public class DSPPackWorker implements IPackWorker {
 
 	@Override
 	public boolean platformEncrypt(String platformPath) {
-		DSPEncryptHandler handler = new DSPEncryptHandler(platformPath);
+		X86EncryptHandler handler = new X86EncryptHandler(platformPath);
 		boolean status = handler.cleanTempFiles();
 		if(status){
 			LogInfo = "清理完成";
@@ -307,7 +312,7 @@ public class DSPPackWorker implements IPackWorker {
 		}
 		FileUtils.copyFolder(templatInstallProjectPath, destInstallProjectPath);
 		
-		DSPPlatformPackHandler handler = new DSPPlatformPackHandler(destInstallProjectPath);
+		X86PlatformPackHandler handler = new X86PlatformPackHandler(destInstallProjectPath);
 		LogInfo = "拷贝平台到打包项目路径下";
 		handler.copyPlatform2installerPath(platformPath);
 		LogInfo = "开始生成安装包操作";

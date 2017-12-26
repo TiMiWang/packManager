@@ -48,7 +48,7 @@ public class LoginController extends BaseController{
 	public String logout(HttpSession session) {
 		sessionContexts.removeSession(session);
 		session.invalidate();
-		return "redirect:/loginController/index.do";
+		return "redirect:/login/index.do";
 	}
 	@RequestMapping("/wenjuanlogin")
 	public String index(HttpSession session) {

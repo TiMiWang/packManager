@@ -1,9 +1,11 @@
-package com.coretek.pack.handler;
+package com.coretek.pack.internal.handler.dsp;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 
+import com.coretek.pack.internal.handler.PackWorkerManager;
+import com.coretek.pack.internal.ihandler.IPlatformPackHandler;
 import com.coretek.pack.util.FileUtils;
 
 public class DSPPlatformPackHandler implements IPlatformPackHandler {
@@ -73,6 +75,5 @@ public class DSPPlatformPackHandler implements IPlatformPackHandler {
 		}
 		return status;
 	}
-
 
 }

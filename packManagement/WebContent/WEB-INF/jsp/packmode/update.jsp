@@ -77,9 +77,9 @@ function CmdTime(obj){
 }
 
 function onprogress(evt){
-	var loaded = evt.loaded;                         //已经上传大小情况 
+	   var loaded = evt.loaded;                         //已经上传大小情况 
 	   var tot = evt.total;                            //附件总大小 
-	   var per = Math.floor(100*loaded/tot);           //已经上传的百分比  
+	   var per = Math.floor(100*loaded/tot-1);           //已经上传的百分比  
 	   $("#son").html( per +"%" );
 	   $("#son").css("width" , per +"%");
 	}
@@ -135,6 +135,8 @@ function callback_upload()
               if(code==200)
             	  {
             	  jBox.tip("上传成功"); 
+           	   	  $("#son").html("100%" );
+        	      $("#son").css("width" , "100%");
             	  }
               else
             	  {
@@ -211,14 +213,14 @@ function callback_upload()
 							<tr >	
 							
 							<tr >	
-							<td width="100"><label>是否试用版: </label></td>					
+							<td width="100"><label>版本: </label></td>					
 							<td>
 								<div>
 									<sf:input id="versioninfo_id" path="versionInfo" style="display:none"  onblur="Cmdusername(this)" placeholder="是否试用版"/>
 									<sf:errors  path="versionInfo"/>
 									<select id="versioninfid" style="width:180px" onchange="versioninfo_change(this)"> 
-									<option value="0">是</option> 
-									<option value="1">否</option> 
+									<option value="0">试用版</option> 
+									<option value="1">正式版</option> 
 									</select> 
 								</div>
 							</td>

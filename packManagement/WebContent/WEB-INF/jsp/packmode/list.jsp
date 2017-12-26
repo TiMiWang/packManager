@@ -282,7 +282,7 @@ $(function(){
 										<!--<th>平台本地路径</th>-->
 										<th>是否SVN签出</th>
 										<th>SVN地址</th>
-										<th>是否试用版</th>
+										<th>版本</th>
 										<th>有效期(天)</th>
 										<th>系统版本</th>
 										<th>架构</th>
@@ -352,9 +352,9 @@ $(function(){
 											} */
 											if("versionInfo${packmode.id}"==1)
 											{
-												$("#versionInfo${packmode.id}").text("是");
+												$("#versionInfo${packmode.id}").text("正式版");
 											}else{
-												$("#versionInfo${packmode.id}").text("否");
+												$("#versionInfo${packmode.id}").text("试用版");
 											}
 											</script>
 												

@@ -1,4 +1,4 @@
-package com.coretek.pack.handler;
+package com.coretek.pack.internal.ihandler;
 
 public interface IPlatformPackHandler {
 

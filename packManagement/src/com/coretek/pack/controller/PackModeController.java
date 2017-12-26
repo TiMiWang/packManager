@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.coretek.pack.handler.IPackWorker;
-import com.coretek.pack.handler.LogInfoHandler;
-import com.coretek.pack.handler.PackWorkerManager;
+import com.coretek.pack.internal.handler.LogInfoHandler;
+import com.coretek.pack.internal.handler.PackWorkerManager;
+import com.coretek.pack.internal.ihandler.IPackWorker;
 import com.coretek.pack.model.LogInfoExample;
 import com.coretek.pack.model.PackMode;
 import com.coretek.pack.model.PackModeExample;
@@ -88,7 +88,7 @@ public class PackModeController {
 		if(session!=null){
 			
 		PackWorkerManager.packBasePath = PackWorkerManager.getpackUtilsPath(session);
-//		PackWorkerManager.packBasePath = "E:/apache-tomcat-7.0.77";
+//		PackWorkerManager.packBasePath = "D:/xampp/tomcat";
 		PackWorkerManager.packUtilsPath = PackWorkerManager.packBasePath+"/packUtils";
 		
 		packmodeexample.clear();
@@ -103,8 +103,7 @@ public class PackModeController {
 		
 		packmodeexample.clear();
 		List<PackMode> packmodelist = packModeService.selectByExample(packmodeexample);
-		Pager<PackMode> listpackmode = new Pager<PackMode>(count,
-				packmodelist);
+		Pager<PackMode> listpackmode = new Pager<PackMode>(count,packmodelist);
 		model.addAttribute("packmodelist", listpackmode);
 		if(statusInfo!=""){
 			model.addAttribute("errorinfo", statusInfo);
@@ -124,7 +123,7 @@ public class PackModeController {
 			}
 			
 	      	String path = PackWorkerManager.packUtilsPath+"/"+"LambdaPRO_"+id;
-	      	if(!new File(path).exists()){
+	      	if(new File(path).exists()){
 	      		FileUtils.delAllFile(path);
 	      	}
 	      	new File(path).mkdir();
