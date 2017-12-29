@@ -51,7 +51,7 @@ public class DSPPluginsExportHandler implements IPluginsExportHandler{
 		buffer.append(pluginsBuildOutPath);
 		buffer.append("\" exportSource=\"false\" exportType=\"directory\" plugins=\"");
 		buffer.append(exportPlugins);
-		buffer.append("\" />\n");
+		buffer.append("\" useJARFormat=\"false\"/>\n");
 		buffer.append("	</target>\n");
 		buffer.append("</project>\n");
 		return buffer.toString();

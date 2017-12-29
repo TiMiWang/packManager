@@ -101,7 +101,7 @@ public class DSPPackWorker implements IPackWorker {
 				return;
 			}
 			LogInfo = "开始构建依赖库";
-			status = buildOSLibarys(preSrcPath+"/os",prePlatformPath+"/DeltaOS/lib/c66xx/little");
+			status = buildOSLibarys(preSrcPath,prePlatformPath+"/DeltaOS/lib/c66xx/little");
 			if(status){
 				LogInfo = "完成构建依赖库";
 			}else{
@@ -171,7 +171,7 @@ public class DSPPackWorker implements IPackWorker {
 				line = br.readLine();
 			}
 			if ((process.waitFor() != 0)) {
-				System.out.println("error");
+				LogInfo = "从SVN导出src目录失败";
 				status = false;
 				return status;
 			}
@@ -190,7 +190,7 @@ public class DSPPackWorker implements IPackWorker {
 				line = br.readLine();
 			}
 			if ((process.waitFor() != 0)) {
-				System.out.println("error");
+				LogInfo = "从SVN导出platform目录失败";
 				status = false;
 			}
 			
@@ -243,8 +243,15 @@ public class DSPPackWorker implements IPackWorker {
 
 	@Override
 	public boolean buildOSLibarys(String srcPath, String libarysBuildOutPath) {
-		// TODO Auto-generated method stub
-		return true;
+		boolean status = true;
+		try{
+		DSPBuildLibaryHandler handler = new DSPBuildLibaryHandler(srcPath,prePlatformPath);
+		status = handler.buildLibs();
+		}catch(Exception ex){
+			ex.getStackTrace();
+			status = false;
+		}
+		return status;
 	}
 
 	@Override
@@ -294,7 +301,7 @@ public class DSPPackWorker implements IPackWorker {
 	@Override
 	public boolean platformPack(String platformPath, String platfomPackPath,int packModeId) {
 		boolean status = true;
-		final File tempPMIdFile = new File(PackWorkerManager.getInstance().packUtilsPath, ""
+		final File tempPMIdFile = new File(PackWorkerManager.packUtilsPath, ""
 				+ "temp" + "_" + packModeId);
 		if (tempPMIdFile.exists()) {
 			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
