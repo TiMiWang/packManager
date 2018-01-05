@@ -7,7 +7,7 @@ public class X86PlatformPackHandler implements IPlatformPackHandler {
 
 	private String installerEXEPath = PackWorkerManager.packBasePath+"/IS12/System/";
 	private String cmdEXEName = "IsCmdBld.exe";
-	private String projectName = "LambdPRO6.0-v12.ism";
+	private String projectName = "LambdaPRO-v12.ism";
 
 	private String installProjectPath = "";
 

@@ -86,7 +86,9 @@ public class FileUtils {
         try {
             String filePath = fileName;
             java.io.File delFile = new java.io.File(filePath);
-            delFile.delete();
+            if(delFile.exists()){
+                delFile.delete();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -104,8 +106,10 @@ public class FileUtils {
             delAllFile(folderPath); 
             String filePath = folderPath;
             java.io.File myFilePath = new java.io.File(filePath);
-            // 删除空文件夹
-            myFilePath.delete(); 
+            if(myFilePath.exists()){
+                // 删除空文件夹
+                myFilePath.delete(); 
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

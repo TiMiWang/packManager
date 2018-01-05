@@ -188,7 +188,7 @@ body { background: url("<%=request.getContextPath() %>/resources/img/bg.jpg") }
 				$("#myForm").cmsvalidate();
 			});
 			var reCheckcode = function(img) {
-				img.src="drawCheckCode.do?"+Math.random();
+				img.src="/login/drawCheckCode.do?"+Math.random();
 			}
 		</script>
 		<title>后台管理登录</title>

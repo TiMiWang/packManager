@@ -350,7 +350,7 @@ $(function(){
 											}else{
 												$("#updatekey${packmode.id}").text("否");
 											} */
-											if("versionInfo${packmode.id}"==1)
+											if("${packmode.versionInfo}"==1)
 											{
 												$("#versionInfo${packmode.id}").text("正式版");
 											}else{

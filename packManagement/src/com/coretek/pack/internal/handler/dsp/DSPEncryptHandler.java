@@ -13,6 +13,7 @@ import com.coretek.pack.util.FileUtils;
 public class DSPEncryptHandler implements IEncryptHandler{
 	String platformPath = "";
 	String encryptPath = PackWorkerManager.packUtilsPath + "/" + "encryption";
+	private String startExePath = "/LambdaIDE/eclipse/plugins/org.eclipse.cdt.core.win32.x86_5.4.0.201509131935/os/win32/x86/starter.exe";
 
 	public DSPEncryptHandler(String platformPath) {
 		this.platformPath = platformPath;
@@ -25,17 +26,31 @@ public class DSPEncryptHandler implements IEncryptHandler{
 		File spawnerFile = new File(platformPath, "LambdaIDE/eclipse/plugins/org.eclipse.cdt.core.win32.x86_5.4.0.201509131935/os/win32/x86/spawner.dat");
 		File vid1DatFile = new File(platformPath,"LambdaIDE/eclipse/plugins/com.ti.ccstudio.base_6.2.1.01781/vid.dat");
 		File vid22DatFile = new File(platformPath,"LambdaIDE/eclipse/plugins/com.coretek.tools.ide.configmanager_1.0.0/vid.dat");
+		
+		File settingsFile = new File(platformPath,"LambdaIDE/eclipse/configuration/.settings");
+		File centerFile = new File(platformPath,"LambdaIDE/eclipse/configuration/com.ti.ccstudio.app.center");
+		File runtimeFile = new File(platformPath,"LambdaIDE/eclipse/configuration/org.eclipse.core.runtime");
+		File themeFile = new File(platformPath,"LambdaIDE/eclipse/configuration/org.eclipse.e4.ui.css.swt.theme");
+		File appFile = new File(platformPath,"LambdaIDE/eclipse/configuration/org.eclipse.equinox.app");
+		File sourceFile = new File(platformPath,"LambdaIDE/eclipse/configuration/org.eclipse.equinox.source");
+		File osgiFile = new File(platformPath,"LambdaIDE/eclipse/configuration/org.eclipse.osgi");
+		File updateFile = new File(platformPath,"LambdaIDE/eclipse/configuration/org.eclipse.update");
+	
 		try {
-			FileUtils.delAllFile(workspaceFile.getAbsolutePath());
-			if(spawnerFile.exists()){
-				FileUtils.delFile(spawnerFile.getAbsolutePath());
-			}
-			if(vid1DatFile.exists()){
-				FileUtils.delFile(vid1DatFile.getAbsolutePath());
-			}
-			if(vid22DatFile.exists()){
-				FileUtils.delFile(vid22DatFile.getAbsolutePath());
-			}
+			FileUtils.delFolder(workspaceFile.getAbsolutePath());
+				
+			FileUtils.delFolder(settingsFile.getAbsolutePath());
+			FileUtils.delFolder(centerFile.getAbsolutePath());
+			FileUtils.delFolder(runtimeFile.getAbsolutePath());
+			FileUtils.delFolder(themeFile.getAbsolutePath());
+			FileUtils.delFolder(appFile.getAbsolutePath());
+			FileUtils.delFolder(sourceFile.getAbsolutePath());
+			FileUtils.delFolder(osgiFile.getAbsolutePath());
+			FileUtils.delFolder(updateFile.getAbsolutePath());
+			
+			FileUtils.delFile(spawnerFile.getAbsolutePath());
+			FileUtils.delFile(vid1DatFile.getAbsolutePath());
+			FileUtils.delFile(vid22DatFile.getAbsolutePath());
 		} catch (Exception ex) {
 			ex.getStackTrace();
 			status = false;
@@ -208,13 +223,21 @@ public class DSPEncryptHandler implements IEncryptHandler{
 				+ "file_encrypt");
 		if (encryptFile.exists()) {
 			try {
+				//清除vid。dat
 				File oldVidFile = new File(encryptFile,"vid.dat");
 				if(oldVidFile.exists()){
 					oldVidFile.delete();
 				}
+				//修改plugin。txt
+				String pluginFilePath = encryptFile.getAbsolutePath() + "/"+"plugin.txt";
+				if(!pluginTxtmodify(pluginFilePath)){
+					status = false;
+					return status;
+				}
+				
 				String memoryThreadPath = encryptFile.getAbsolutePath() + "/"
 						+ "memeroyThread.cfg";
-				if (memeroyThreadModeify(arch, systemVersion, versionInfo,
+				if (memeroyThreadModify(arch, systemVersion, versionInfo,
 						time, memoryThreadPath)) {
 					// 執行生成命令
 					String[] commands = { "java", "-jar",
@@ -259,6 +282,25 @@ public class DSPEncryptHandler implements IEncryptHandler{
 		}
 		return status;
 	}
+	
+	private boolean pluginTxtmodify(String pluginFilePath){
+		boolean status = true;
+		try{
+		File pluginTxtFile = new File(pluginFilePath);
+		if(pluginTxtFile.exists()){
+			pluginTxtFile.delete();
+		}
+		pluginTxtFile.createNewFile();
+		PrintWriter writer = new PrintWriter(pluginTxtFile);
+		writer.write(startExePath);
+		writer.flush();
+		writer.close();
+		}catch(Exception ex){
+			status = false;
+			ex.getStackTrace();
+		}
+		return status;
+	}
 
 	/**
 	 * 修改memoryThread.cfg文件
@@ -267,7 +309,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 	 * @param time
 	 * @param memeroyThreadpath
 	 */
-	private boolean memeroyThreadModeify(String arch, String systemVersion,
+	private boolean memeroyThreadModify(String arch, String systemVersion,
 			int versionInfo, int time, String memeroyThreadpath) {
 		boolean status = true;
 		File memeroyThreadFile = new File(memeroyThreadpath);

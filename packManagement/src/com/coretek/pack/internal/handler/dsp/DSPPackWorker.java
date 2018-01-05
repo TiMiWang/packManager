@@ -308,8 +308,8 @@ public class DSPPackWorker implements IPackWorker {
 		}
 		tempPMIdFile.mkdirs();
 		try{
-		String templatInstallProjectPath = PackWorkerManager.packUtilsPath+"/installPackage"+"/LambdPRO6.0-v12-DSP";
-		String destInstallProjectPath = tempPMIdFile+"/"+"LambdPRO6.0-v12-DSP";
+		String templatInstallProjectPath = PackWorkerManager.packUtilsPath+"/installPackage"+"/LambdaPRO6.0-v12-DSP";
+		String destInstallProjectPath = tempPMIdFile+"/"+"LambdaPRO6.0-v12-DSP";
 		if(!new File(destInstallProjectPath).exists()){
 			new File(destInstallProjectPath).mkdirs();
 		}

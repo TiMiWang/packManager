@@ -12,7 +12,7 @@ public class DSPPlatformPackHandler implements IPlatformPackHandler {
 
 	private String installerEXEPath = PackWorkerManager.packBasePath+"/IS12/System/";
 	private String cmdEXEName = "IsCmdBld.exe";
-	private String projectName = "LambdPRO6.0-v12.ism";
+	private String projectName = "LambdaPRO-v12.ism";
 
 	private String installProjectPath = "";
 
@@ -22,7 +22,7 @@ public class DSPPlatformPackHandler implements IPlatformPackHandler {
 
 	@Override
 	public void copyPlatform2installerPath(String platformPath) {
-		String destPath = installProjectPath + "/LambdPRO6.0";
+		String destPath = installProjectPath + "/LambdaPRO";
 		FileUtils.copyFolder(platformPath, destPath);
 	}
 
