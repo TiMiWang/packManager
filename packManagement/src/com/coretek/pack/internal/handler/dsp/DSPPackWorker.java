@@ -91,7 +91,7 @@ public class DSPPackWorker implements IPackWorker {
 	        }
 			
 			LogInfo = "开始构建插件";
-			boolean status = buildPlugins(preSrcPath+"/"+"tool/host/ide/src",prePlatformPath+"/LambdaIDE/eclipse",packmode.getId());
+			boolean status = buildPlugins(preSrcPath+"/"+"tool/host/ide/src",prePlatformPath+"/LambdaIDE/eclipse/plugins",packmode.getId());
 			if(status){
 				LogInfo = "完成构建插件";
 			}else{
@@ -205,38 +205,47 @@ public class DSPPackWorker implements IPackWorker {
 	public boolean buildPlugins(String pluginsSrcPath,
 			String pluginsBuildOutPath,int packModeId) {
 		boolean status = true;
-		File tempPMIdFile = new File(PackWorkerManager.packUtilsPath, ""
-				+ "temp" + "_" + packModeId);
-		if (tempPMIdFile.exists()) {
-			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
-		}
-		tempPMIdFile.mkdirs();
 		try{
 		IPluginsExportHandler handler = new DSPPluginsExportHandler();
-		LogInfo = "开始生成配置文件";
-		String tempPluginXMLPath = tempPMIdFile+"/"+"pluginexport.xml";
-		String tempBuildXMLPath = tempPMIdFile+"/"+"build.xml";
-		
-		String xmlStr = handler.pluginXmlGen(pluginsBuildOutPath);
-		FileUtils.contentToFile(tempPluginXMLPath, xmlStr);
-		
-		xmlStr = handler.buildXmlGen(tempPluginXMLPath);
-		FileUtils.contentToFile(tempBuildXMLPath, xmlStr);
-		LogInfo = "插件导出前准备";
-		status = handler.PluginSrcRedirectePath(pluginsSrcPath);
+		LogInfo = "进行MVN配置文件修改";
+		status = handler.MVNConfigModify();
 		if(!status){
-			LogInfo = "重定向插件失败";
-			status = false;
+			LogInfo = "MVN配置文件修改失败";
 			return status;
 		}
-		LogInfo = "开始导出插件";
-		status = handler.ExportRun(tempPMIdFile.getAbsolutePath());
+		LogInfo = "MVN配置文件修改完成";
+		LogInfo = "进行修改父模型配置文件";
+		status = handler.MVNParentModuleModify();
+		if(!status){
+			LogInfo = "修改父模型配置文件失败";
+			return status;
+		}
+		LogInfo = "修改父模型配置文件成功";
+		LogInfo = "进行父模型编译";
+		status = handler.MVNParentModuleBuild();
+		if(!status){
+			LogInfo = "父模型编译失败";
+			return status;
+		}
+		LogInfo = "父模型编译成功";
+		LogInfo = "进行编译插件";
+		status = handler.pluginsBuildAndInstall(pluginsSrcPath);
+		if(!status){
+			LogInfo = "编译插件失败";
+			return status;
+		}
+		LogInfo = "编译插件成功";
+		LogInfo = "重定向插件";
+		status = handler.redirectPLuginsToPlatform(pluginsBuildOutPath);
+		if(!status){
+			LogInfo = "重定向插件失败";
+			return status;
+		}
+		LogInfo = "重定向插件成功";
 		
 		}catch(Exception ex){
 			status = false;
 			ex.getStackTrace();
-		}finally{
-			FileUtils.delFolder(tempPMIdFile.getAbsolutePath());
 		}
 		return status;
 	}

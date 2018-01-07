@@ -2,15 +2,33 @@ package com.coretek.pack.internal.ihandler;
 
 public interface IPluginsExportHandler {
 	
+	
 	/**
-	 * 将插件源码复制到工作空间指定的路径下
-	 * @param pluginSrcPath
+	 * 修改setting localRepository为绝对路径下的.m2
+	 * 只修改一次通过isM判断odifyMVNCfg
 	 * @return
 	 */
-	boolean PluginSrcRedirectePath(String pluginSrcPath);
+	boolean MVNConfigModify();
 	
-	String buildXmlGen(String pluginXmlPath);
-	String pluginXmlGen(String pluginsBuildOutPath);
+	/**
+	 * 修改父pom的本地P2仓库路径
+	 * @return
+	 */
+	boolean MVNParentModuleModify();
 	
-	boolean ExportRun(String buildXmlPath);
+	/**
+	 * 编译安装父module到仓库
+	 * @return
+	 */
+	boolean MVNParentModuleBuild();
+	
+	/**
+	 * 
+	 * @param pluginsSrcPath
+	 * @return
+	 */
+	boolean pluginsBuildAndInstall(String pluginsSrcPath);
+	
+	boolean redirectPLuginsToPlatform(String platformPluginsPath);
+	
 }
