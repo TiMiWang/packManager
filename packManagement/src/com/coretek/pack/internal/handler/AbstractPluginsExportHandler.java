@@ -20,8 +20,13 @@ public abstract class AbstractPluginsExportHandler implements IPluginsExportHand
 	protected String commonRepoPath = M2Path+"/repository";
 	
 	protected String MVNPath = pluginsExportPath+"/apache-maven-3.5.2";
+<<<<<<< HEAD
 	protected String parentModulePath = pluginsExportPath+"/com.coretek.maven.parent";
 	protected String buildModulePath = pluginsExportPath+"/com.coretek.maven.build";
+=======
+	protected String parentModulePath = pluginsExportPath+"/com.coretek.ide.maven.parent";
+	protected String buildModulePath = pluginsExportPath+"/com.coretek.ide.build";
+>>>>>>> 5ee2f144634f7d3e48f9d5682aa88e22f5683c49
 	
 	@Override
 	public boolean MVNConfigModify() {

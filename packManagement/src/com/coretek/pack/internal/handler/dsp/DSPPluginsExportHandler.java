@@ -13,12 +13,19 @@ import com.coretek.pack.util.FileUtils;
 
 public class DSPPluginsExportHandler extends AbstractPluginsExportHandler{
 	
+<<<<<<< HEAD
 	public final String platformType = "dsp";
 	
 	private String dspP2RepoPath = P2RepoPath+"/"+platformType;
 
 	private String dspparentModulePath = parentModulePath+"/"+platformType;
 	private String dspbuildModulePath = buildModulePath+"/"+platformType;
+=======
+	private String dspP2RepoPath = P2RepoPath+"/dsp";
+
+	private String dspparentModulePath = parentModulePath+"/dsp";
+	private String dspbuildModulePath = buildModulePath+"/dsp";
+>>>>>>> 5ee2f144634f7d3e48f9d5682aa88e22f5683c49
 	private String groupName = "com.coretek.dsp.group";
 	
 	@Override
@@ -34,7 +41,11 @@ public class DSPPluginsExportHandler extends AbstractPluginsExportHandler{
 				String bufferline = "";
 				while((bufferline = reader.readLine())!=null){
 					if(bufferline.contains("<url>")){
+<<<<<<< HEAD
 						bufferline = "<url>file:///"+dspP2RepoPath+"</url>";
+=======
+						bufferline = "<url>"+dspP2RepoPath+"</url>";
+>>>>>>> 5ee2f144634f7d3e48f9d5682aa88e22f5683c49
 					}
 					buffer.append(bufferline);
 					buffer.append(linesepar);
@@ -58,7 +69,11 @@ public class DSPPluginsExportHandler extends AbstractPluginsExportHandler{
 	public boolean MVNParentModuleBuild() {
 		boolean status = true;
 		try {
+<<<<<<< HEAD
 			String[] commands = {MVNPath+"/bin/mvn.cmd","clean","install"};
+=======
+			String[] commands = {MVNPath+"/bin/mvn.bat","clean","install"};
+>>>>>>> 5ee2f144634f7d3e48f9d5682aa88e22f5683c49
 			ProcessBuilder processtest = new ProcessBuilder(commands);
 			processtest.directory(new File(dspparentModulePath));
 			processtest.redirectErrorStream(true);
@@ -88,7 +103,11 @@ public class DSPPluginsExportHandler extends AbstractPluginsExportHandler{
 		File tmpBuildFile = new File(pluginsSrcPath+"/dsp");
 		if(tmpBuildFile.exists()){
 			try {
+<<<<<<< HEAD
 				String[] commands = {MVNPath+"/bin/mvn.cmd","clean","install"};
+=======
+				String[] commands = {MVNPath+"/bin/mvn.bat","clean","install"};
+>>>>>>> 5ee2f144634f7d3e48f9d5682aa88e22f5683c49
 				ProcessBuilder processtest = new ProcessBuilder(commands);
 				processtest.directory(tmpBuildFile);
 				processtest.redirectErrorStream(true);
@@ -109,6 +128,7 @@ public class DSPPluginsExportHandler extends AbstractPluginsExportHandler{
 				status = false;
 				e.printStackTrace();
 			}
+<<<<<<< HEAD
 		}
 		return status;
 	}
@@ -140,6 +160,28 @@ public class DSPPluginsExportHandler extends AbstractPluginsExportHandler{
 		}catch(Exception ex){
 			ex.getStackTrace();
 			status = false;
+=======
+		}
+		return status;
+	}
+	
+	@Override
+	public boolean redirectPLuginsToPlatform(String platformPluginsPath) {
+		boolean status = true;
+		String dspGroupPath = commonRepoPath+"/"+groupName.replace(".", "/");
+		File dspGroupFile = new File(dspGroupPath);
+		if(dspGroupFile.exists() && dspGroupFile.isDirectory()){
+			List<File> jarList = FileUtils.fileFilter(dspGroupFile, ".jar");
+			if(jarList.size()>0){
+				for (File file : jarList)
+				{
+					FileUtils.copyFile(file.getAbsolutePath(), platformPluginsPath);
+				}
+				//TODO 需要对需要解压的jar进行解压操作
+			}else{
+				status = false;
+			}
+>>>>>>> 5ee2f144634f7d3e48f9d5682aa88e22f5683c49
 		}
 		return status;
 	}
@@ -153,6 +195,7 @@ public class DSPPluginsExportHandler extends AbstractPluginsExportHandler{
 //			e.printStackTrace();
 //		}
 //	}
+
 
 
 }
