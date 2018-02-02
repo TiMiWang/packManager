@@ -72,9 +72,18 @@
 							<li class="">
 								<a href="<%=request.getContextPath() %>/loginfo/getallloginfo.do" target="mainFrame">
 									<i class="menu-icon fa fa-caret-right"></i>
-										打包记录
+										打包日志
 								</a>
 							</li>	
+						</ul>
+						<b class="arrow"></b>
+						<ul class="submenu">
+							<li class="">
+								<a href="<%=request.getContextPath() %>/installpack/getinstallpack/all.do" target="mainFrame">
+									<i class="menu-icon fa fa-caret-right"></i>
+										安装包管理
+								</a>
+							</li>
 							
 						</ul>
 												

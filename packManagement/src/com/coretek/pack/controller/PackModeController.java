@@ -21,6 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.coretek.pack.internal.handler.LogInfoHandler;
 import com.coretek.pack.internal.handler.PackWorkerManager;
 import com.coretek.pack.internal.ihandler.IPackWorker;
+import com.coretek.pack.model.InstallPack;
+import com.coretek.pack.model.InstallPackExample;
+import com.coretek.pack.model.InstallPackView;
+import com.coretek.pack.model.InstallPackViewExample;
 import com.coretek.pack.model.LogInfoExample;
 import com.coretek.pack.model.PackMode;
 import com.coretek.pack.model.PackModeExample;
@@ -28,6 +32,8 @@ import com.coretek.pack.model.Person;
 import com.coretek.pack.model.PersonExample;
 import com.coretek.pack.page.Pager;
 import com.coretek.pack.page.SystemContext;
+import com.coretek.pack.service.IInstallPackService;
+import com.coretek.pack.service.IInstallPackViewService;
 import com.coretek.pack.service.IPackModeService;
 import com.coretek.pack.service.IPersonSerivce;
 import com.coretek.pack.service.IlogInfoService;
@@ -44,6 +50,8 @@ public class PackModeController {
 	private IPackModeService packModeService;
 	private IPersonSerivce personservice;
 	private IlogInfoService loginfoservice;
+	IInstallPackService installPackService;
+	IInstallPackViewService installViewPackService;
 	
 	private PackWorkerManager packWorkerManager = PackWorkerManager.getInstance();
 	private LogInfoHandler loginfoHandler = new LogInfoHandler();
@@ -51,6 +59,7 @@ public class PackModeController {
 	private PackModeExample packmodeexample = new PackModeExample();
 	private PersonExample personexample = new PersonExample();
 	private LogInfoExample loginfo = new LogInfoExample();
+	private InstallPackViewExample installPackViewExample = new InstallPackViewExample();
 	
 	private String statusInfo = "";
 	
@@ -58,6 +67,11 @@ public class PackModeController {
 	
 	public IPackModeService getPackModeService() {
 		return packModeService;
+	}
+	
+	@Inject
+	public void setInstallPackService(IInstallPackService installPackService) {
+		this.installPackService = installPackService;
 	}
 	
 	@Inject
@@ -88,7 +102,7 @@ public class PackModeController {
 		if(session!=null){
 			
 		PackWorkerManager.packBasePath = PackWorkerManager.getpackUtilsPath(session);
-//		PackWorkerManager.packBasePath = "D:/xampp/tomcat";
+		PackWorkerManager.packBasePath = "D:/xampp/tomcat";
 		PackWorkerManager.packUtilsPath = PackWorkerManager.packBasePath+"/packUtils";
 		
 		packmodeexample.clear();
@@ -160,6 +174,10 @@ public class PackModeController {
 			ajaxMsg.addData("loginfo", packworker.getLogInfo());
 			ajaxMsg.addData("status", packmode.getStatus());
 			ajaxMsg.addData("issuccess",packworker.isSuccess());
+			//如果成功，保存安装包
+			if(packworker.isSuccess()){
+				saveInstallPack((int)session.getAttribute("userid"),id,packworker);
+			}
 		}else{
 			packmode.setStatus(0);
 			packModeService.updateByPrimaryKey(packmode);
@@ -275,26 +293,38 @@ public class PackModeController {
 	@RequestMapping(value = "download/{id}", method = RequestMethod.GET)
 	public String downInstallPackFile(@PathVariable("id") int id,HttpSession session){
 		String visitPath = "";
-		IPackWorker packwork = PackWorkerManager.getInstance().getPackWorker(id);
-		if(packwork==null){
-			return null;
+		installPackViewExample.clear();
+		installPackViewExample.createCriteria().andPackModeIdEqualTo(id);
+		installPackViewExample.setOrderByClause("daye_time desc");
+		List<InstallPackView> installPackViews = installViewPackService.selectByExample(installPackViewExample);
+		if(installPackViews.size()>0){
+			visitPath = installPackViews.get(0).getInstallPackPath();
 		}
-		String installPackPath = packwork.getoutputpackpath();
-		File file = new File(installPackPath,"Setup.exe");  
-		if(file.exists()){	
-		String resourcesPath = file.getAbsolutePath();
-		resourcesPath = resourcesPath.replace("\\", "/");
-		visitPath = resourcesPath.substring(resourcesPath.indexOf("resources/platform"),resourcesPath.length()); 
 		//新建日志
 		String userid = session.getAttribute("userid")+"";
 		if(userid!=""){
 			loginfoHandler.insert(Integer.parseInt(userid), id, "下载了安装包文件");
 		}
-		}
 		System.out.println("输出路径："+visitPath);
 		return "redirect:/"+visitPath;  
 		
 	} 
+	
+	private void saveInstallPack(int userid,int packmodeid,IPackWorker packworker){
+		String installPackPath = packworker.getoutputpackpath();
+		String setupZipName = packworker.getSetupZipName();
+		File file = new File(installPackPath,setupZipName);  
+		if(file.exists()){
+		//新建日志
+		int logInfoKey = loginfoHandler.insert(userid, packmodeid, "打安装包完成");
+		String resourcesPath = file.getAbsolutePath();
+		resourcesPath = resourcesPath.replace("\\", "/");
+		String visitPath = resourcesPath.substring(resourcesPath.indexOf("resources/platform"),resourcesPath.length()); 
+		
+		InstallPack installpack = new InstallPack(userid,packmodeid,logInfoKey,visitPath);
+		installPackService.insert(installpack);
+	}
+	}
 	
 //	@RequestMapping(value = "download/{id}", method = RequestMethod.GET)
 //	public @ResponseBody ResponseEntity<byte[]> downInstallPackFile(@PathVariable("id") int id,HttpSession session){

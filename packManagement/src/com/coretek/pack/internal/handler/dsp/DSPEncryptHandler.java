@@ -25,7 +25,6 @@ public class DSPEncryptHandler implements IEncryptHandler{
 		File workspaceFile = new File(platformPath, "workspace");
 		File spawnerFile = new File(platformPath, "LambdaIDE/eclipse/plugins/org.eclipse.cdt.core.win32.x86_5.4.0.201509131935/os/win32/x86/spawner.dat");
 		File vid1DatFile = new File(platformPath,"LambdaIDE/eclipse/plugins/com.ti.ccstudio.base_6.2.1.01781/vid.dat");
-		File vid22DatFile = new File(platformPath,"LambdaIDE/eclipse/plugins/com.coretek.tools.ide.configmanager_1.0.0/vid.dat");
 		
 		File settingsFile = new File(platformPath,"LambdaIDE/eclipse/configuration/.settings");
 		File centerFile = new File(platformPath,"LambdaIDE/eclipse/configuration/com.ti.ccstudio.app.center");
@@ -50,7 +49,6 @@ public class DSPEncryptHandler implements IEncryptHandler{
 			
 			FileUtils.delFile(spawnerFile.getAbsolutePath());
 			FileUtils.delFile(vid1DatFile.getAbsolutePath());
-			FileUtils.delFile(vid22DatFile.getAbsolutePath());
 		} catch (Exception ex) {
 			ex.getStackTrace();
 			status = false;
@@ -83,7 +81,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 					+ "com/coretek/ide/system/core" + "/" + "Activator.class";
 			String destPath = platformPath + "/"
 					+ "LambdaIDE/eclipse/jre/bin/client";
-			FileUtils.copyFile(filePath, destPath);
+			FileUtils.copyFiletoDir(filePath, destPath);
 			File newDcptFile = new File(destPath, "dcpt.jsa");
 			if (newDcptFile.exists()) {
 				newDcptFile.delete();
@@ -183,7 +181,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 					+ "com/coretek/ide/system/core" + "/" + "Activator.class";
 			String destPath = platformPath + "/"
 					+ "LambdaIDE/eclipse/jre/bin/client";
-			FileUtils.copyFile(filePath, destPath);
+			FileUtils.copyFiletoDir(filePath, destPath);
 			File newSapFile = new File(destPath, "sap.jsa");
 			if (newSapFile.exists()) {
 				newSapFile.delete();
@@ -261,7 +259,7 @@ public class DSPEncryptHandler implements IEncryptHandler{
 						if (vidFile.exists()) {
 							// 拷貝vid.dat到平臺目錄
 							String newVidPath = platformPath+ "/"+ "LambdaIDE/eclipse/plugins/com.ti.ccstudio.base_6.2.1.01781";
-							FileUtils.copyFile(vidFile.getAbsolutePath(),
+							FileUtils.copyFiletoDir(vidFile.getAbsolutePath(),
 									newVidPath);
 						} else {
 							status = false;

@@ -21,9 +21,16 @@ public class DSPPlatformPackHandler implements IPlatformPackHandler {
 	}
 
 	@Override
-	public void copyPlatform2installerPath(String platformPath) {
+	public boolean copyPlatform2installerPath(String platformPath) {
+		boolean status = true;
+		try{
 		String destPath = installProjectPath + "/LambdaPRO";
 		FileUtils.copyFolder(platformPath, destPath);
+		}catch(Exception ex){
+			ex.getStackTrace();
+			status = false;
+		}
+		return status;
 	}
 
 	@Override
@@ -58,14 +65,14 @@ public class DSPPlatformPackHandler implements IPlatformPackHandler {
 	}
 	
 	@Override
-	public boolean installPackageMoving(String srcInstallPackagePath,String destInstallPackagePath){
+	public boolean installPackageMoving(String srcInstallPackagePath,String destInstallPackagePath,String setupZipName){
 		boolean status = true;
 		try{
-			//test
-
 			File file = new File(srcInstallPackagePath);
 			if(file.exists()){
-				FileUtils.moveFile(srcInstallPackagePath, destInstallPackagePath);
+				FileUtils.fileToZip(srcInstallPackagePath, destInstallPackagePath, setupZipName);
+				file.delete();
+//				FileUtils.moveFile(srcInstallPackagePath, destInstallPackagePath);
 			}else{
 				status = false;
 			}

@@ -30,7 +30,7 @@ public class LogInfoHandler {
 		this.personservice = personservice;
 	}
 
-	public void insert(int userId,int packModeId,String content){
+	public int insert(int userId,int packModeId,String content){
 		PackMode packmode = packModeService.selectByPrimaryKey(packModeId);
 		Person person = personservice.selectByPrimaryKey(userId);
 		if(packmode!=null && person!=null){
@@ -52,7 +52,8 @@ public class LogInfoHandler {
 			DateFormat fd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			loginfo.setDateTime(currentdate);
 			loginfo.setDateTimeStr(fd.format(currentdate));
-			loginfoservice.insert(loginfo);
+			return loginfoservice.insert(loginfo);
 		}
+		return -1;
 	}
 }

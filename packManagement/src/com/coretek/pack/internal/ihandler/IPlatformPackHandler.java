@@ -6,7 +6,7 @@ public interface IPlatformPackHandler {
 	 * 拷贝平台到打包项目路径下
 	 * @param platformPath
 	 */
-	void copyPlatform2installerPath(String platformPath);
+	boolean copyPlatform2installerPath(String platformPath);
 	
 	/**
 	 * 开始运行打安装包操作
@@ -20,6 +20,6 @@ public interface IPlatformPackHandler {
 	 * @param destInstallPackagePath
 	 * @return
 	 */
-	boolean installPackageMoving(String srcInstallPackagePath,String destInstallPackagePath);
+	boolean installPackageMoving(String srcInstallPackagePath,String destInstallPackagePath,String setupZipName);
 	
 }

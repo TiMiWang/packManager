@@ -13,6 +13,8 @@ public interface IPackWorker extends Runnable {
 	boolean isSuccess();
 	
 	String getoutputpackpath();
+	
+	String getSetupZipName(); 
 
 	/**
 	 * svn导出平台文件
